@@ -1,0 +1,46 @@
+[project]
+name = "polair"
+description = "processing of polar aircraft aerosol and turbulence data"
+authors = [
+    {name = "Laura Köhler", email = "laura.koehler@awi.de"},
+]
+readme = "README.md"
+dynamic = ["version"]
+
+dependencies = [
+    "xarray",
+    "numpy",
+    "metpy",
+    "scipy",
+    "pyyaml",
+    "netcdf4",
+    "datetime",
+    "dask",
+    "pint_xarray",
+]
+
+
+[project.optional-dependencies]
+tests = [
+    "pytest",
+    "black"
+]
+
+[project.scripts]
+polair = "polair.cli:main"
+
+[tool.setuptools]
+packages = ["polair"]
+
+[tool.setuptools.dynamic]
+version = {attr = "polair.__version__"}
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+    "tests",
+]
+
+[build-system]
+requires = ["setuptools>=45"]
+build-backend = "setuptools.build_meta"
