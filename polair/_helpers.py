@@ -5,6 +5,7 @@ import yaml
 import re
 from pathlib import Path
 from datetime import datetime
+import pint_xarray
 
 def import_dictionary(yaml_file):
     """
@@ -175,10 +176,66 @@ def interpolate_time(df, v, var_dict, steps = 0.01):
         ds = ds[[v]]
     else:
         ds = df.set_index("time").to_xarray()
-        if var_dict[v]["units_old"] == "degree": # Circular mean if unit in degrees
+        if var_dict[v]["units_old"] == "degree" and v not in ["pitch_inat", "roll_inat", "rolr", "pitr", "pit", "roll", "lat", "lon", "lat_inat", "lon_inat", "lat_gprmc", "lon_gprmc"]: # Circular mean if unit in degrees
             sin = np.sin(np.deg2rad(ds[v])).resample(time=f"{steps}s").interpolate("linear")
             cos = np.cos(np.deg2rad(ds[v])).resample(time=f"{steps}s").interpolate("linear")
             ds = (np.rad2deg(np.arctan2(sin,cos)) % 360).to_dataset(name = v)
         else:
             ds = ds.resample(time=f"{steps}s").interpolate("linear")
     return ds
+
+def add_attrs_var(ds, v, var_dict):
+    """
+    This function adds all attributes from the variable dictrionary except for the old name which is only necessary to read in the correct file. It adds the original unit because no unit conversion is done so far.
+    
+    ds: xarray dataset
+    v: variable for which attributes are added
+    var_dict: dictionary with all the information for each parameter
+    """
+    attrs = var_dict[v]
+    for at in list(attrs.keys()):
+        if not at in ["old", "units", "units_old", "platform"]:
+            att = attrs[at]
+            if att == None:
+                att = "-"
+            ds[v].attrs[at] = att
+        unit = attrs["units"]
+        if not unit == "UTC":
+            ds[v].attrs["units"] = unit
+    return ds
+
+def add_global_attrs(ds, config, flight):
+    """
+    This function adds metadata to the data set as stated in the config file
+
+    ds: data set
+    config: config file
+    flight: research flight which is processed
+    """
+    attrs = config["metadata"]
+    ds.attrs = attrs
+    title = f"{config["campaign"]["name"]} RF{flight:02} {config["flights"][flight]["date"]}: Calibrated raw data"
+    ds.attrs["title"] = title
+    return ds
+
+def convert_unit(ds, var_dict, v):
+    if not v in ["t_inat_gpgga", "t_inat_piahs", "t_gpgga", "t_gprmc"]:
+        unit_old = str(var_dict[v]["units_old"])
+        unit_new = str(var_dict[v]["units"])
+        if unit_old[:4] == "9.81":
+            ds_unit_old = 9.81 * ds[v].pint.quantify("m/s^2")
+        else:
+            ds_unit_old = ds[v].pint.quantify(unit_old)
+        ds_unit_new = ds_unit_old.pint.to(unit_new)
+        ds = ds_unit_new.to_dataset().pint.dequantify()
+    return ds
+
+def g_welmec(lat, h):
+    '''
+    ratio of gravitational acceleration according to Welmec-Formula devided by 9.81
+
+    lat: latitude in degree
+    h: height above sea level in m
+    '''
+    g_ratio = (9.780318 * (1 + 0.0053024 * np.sin(np.deg2rad(lat))**2 - 0.0000058 * np.sin(2*np.deg2rad(lat))) - 0.000003085 * h)
+    return g_ratio

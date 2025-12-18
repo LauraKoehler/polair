@@ -27,7 +27,7 @@ def cal(v, cal_file, df, fn_prefix, var_dict):
                      "t_gpgga": 1, "n_gpgga": 7, "hdop_gpgga": 8, "h_gpgga": 9, "geoid_gpgga": 11, 
                      "ttrk_inat": 1, "mtrk_inat": 3, "gs_inat": 7,
                      "t_gprmc": 1, "gs_gprmc": 7, "ttrk_gprmc": 8,  "lat_gprmc": 3,  "lon_gprmc": 5, 
-                     "gs_bestvel": 5, "ttrk_bestvel": 6, "w_bestvel": 7, "age_bestvel": 4, "latency_bestvel": 3}
+                     "gs_bestvel": 13, "ttrk_bestvel": 14, "w_bestvel": 15, "age_bestvel": 12, "latency_bestvel": 11}
         if v in ["t_inat_gpgga", "lat_inat", "lon_inat", "q_inat", "n_inat", "hdop_inat", "h_inat", "geoid_inat", 
                "t_gpgga", "n_gpgga", "hdop_gpgga", "h_gpgga", "geoid_gpgga"]:
             df = df[df[v].str.startswith("$GPGGA")].reset_index()
@@ -48,13 +48,19 @@ def cal(v, cal_file, df, fn_prefix, var_dict):
             times_s = pd.Series(times)
             calibrated = pd.to_datetime(dates_s + ' ' + times_s, format='%Y-%m-%d %H%M%S.%f').values
         elif v in ["lat_inat", "lat_gprmc"]:
+            degs = (vals/100).astype("int")
+            mins = vals - degs * 100
+            vals = degs + mins/60
             orientation = split_cols[message_cols[v]+1].values
             signs = np.where(orientation == 'N', 1, -1)
-            calibrated = signs * vals/100
+            calibrated = signs * vals
         elif v in ["lon_inat", "lon_gprmc"]:
+            degs = (vals/100).astype("int")
+            mins = vals - degs * 100
+            vals = degs + mins/60
             orientation = split_cols[message_cols[v]+1].values
             signs = np.where(orientation == 'E', 1, -1)
-            calibrated = signs * vals/100
+            calibrated = signs * vals
         else:
             calibrated = vals
     elif v in ["h_rad"]: 
