@@ -174,27 +174,44 @@ def alignement_correction(data, fhp_params, v, platform):
     a1_qc = fhp_params[platform][v]["a1_qc"]
     a1_ps = fhp_params[platform][v]["a1_ps"]
     a1_qratio = fhp_params[platform][v]["a1_qratio"]
-    if v in ["qb", "qc", "ps"]:
-        out = a0 + a1_qb * data.qbN + a1_qc * data.qcN + a1_ps * data.psN
-    elif v in ["alpha"]:
-        out = a0 + a1_qratio * data.qaN/data.qcN
-    elif v in ["beta"]:
-        b0 = fhp_params[platform]["qb"]["a0"]
-        b1_qb = fhp_params[platform]["qb"]["a1_qb"]
-        b1_qc = fhp_params[platform]["qb"]["a1_qc"]
-        b1_ps = fhp_params[platform]["qb"]["a1_ps"]
-        qb = b0 + b1_qb * data.qbN + b1_qc * data.qcN + b1_ps * data.psN
-        out = a0 + a1_qratio * qb/data.qcN
+    if platform == "noseboom":
+        if v in ["qb", "qc", "ps"]:
+            out = a0 + a1_qb * data.qbN + a1_qc * data.qcN + a1_ps * data.psN
+        elif v in ["alpha"]:
+            out = a0 + a1_qratio * data.qaN/data.qcN
+        elif v in ["beta"]:
+            b0 = fhp_params[platform]["qb"]["a0"]
+            b1_qb = fhp_params[platform]["qb"]["a1_qb"]
+            b1_qc = fhp_params[platform]["qb"]["a1_qc"]
+            b1_ps = fhp_params[platform]["qb"]["a1_ps"]
+            qb = b0 + b1_qb * data.qbN + b1_qc * data.qcN + b1_ps * data.psN
+            out = a0 + a1_qratio * qb/data.qcN
+    elif platform == "tbird":
+        if v in ["qb", "qc", "ps"]:
+            out = a0 + a1_qb * data.qbT + a1_qc * data.qcT + a1_ps * data.psT
+        elif v in ["alpha"]:
+            out = a0 + a1_qratio * data.qaT/data.qcT
+        elif v in ["beta"]:
+            b0 = fhp_params[platform]["qb"]["a0"]
+            b1_qb = fhp_params[platform]["qb"]["a1_qb"]
+            b1_qc = fhp_params[platform]["qb"]["a1_qc"]
+            b1_ps = fhp_params[platform]["qb"]["a1_ps"]
+            qb = b0 + b1_qb * data.qbT + b1_qc * data.qcT + b1_ps * data.psT
+            out = a0 + a1_qratio * qb/data.qcT
     return out
 
-def get_true_air_speed(data):
+def get_true_air_speed(data, platform):
     '''
     Calculate true air speed from air density
 
     data: data with corrected variables (adiabatic corrected Te_N_corr and ps)
     '''
+    if platform == "noseboom":
+        temp = "Te_N_corr"
+    elif platform == "tbird":
+        temp = "Te_T_corr"
     Rs = 287.058
-    rho = data.ps / (Rs * data.Te_N_corr)
+    rho = data.ps / (Rs * data[temp])
     tas = np.sqrt(2 * data.qc/rho)
     return tas
 
@@ -212,18 +229,22 @@ def hbaro_icao(data):
     h = T0/L * ((data.ps/p0)**(-R * L / g) -1)
     return h
 
-def hbaro(data, start, stop):
+def hbaro(data, start, stop, platform):
     '''
     Get barometric pressure from pressure and temperature
 
     data: dataset with ps and Te_N_corr
     config: config file defining start and stop of the flight
     '''
+    if platform == "noseboom":
+        t_air = "Te_N_corr"
+    elif platform == "tbird":
+        t_air = "Te_T_corr"
     Rs = 287.058
     hicao = hbaro_icao(data)
     g = h.g_welmec(data.lat_corr, hicao)
     deltap = data.ps.diff("time")
-    deltah = (- Rs * data.Te_N_corr * deltap)/ (data.ps * g)
+    deltah = (- Rs * data[t_air] * deltap)/ (data.ps * g)
     hbaro = deltah.sel(time = slice(start, stop)).cumsum()
     return hbaro
 
@@ -240,61 +261,77 @@ def deltah(data):
     deltah = (- Rs * data.Te_N_corr * p.diff("time"))/ (p * g)
     return deltah
 
-def get_wind_component(data, data_corr, component):
+def get_wind_component(data, data_corr, component, platform):
     '''
     Get wind components from calibrated raw data and corrected data
 
     data: dataset with raw data
     data_corr: dataset with corrected data
-    component: wind component, options "u", "v", "w"
+    component: wind component, options "u", "v", "vertwind"
+    platform: noseboom or tbird
     '''
-    theta = np.deg2rad(data["pit"])
-    phi = np.deg2rad(data["roll"])
-    alpha = np.deg2rad(data_corr["alpha"])
-    beta = np.deg2rad(data_corr["beta"])
-    thdg = np.deg2rad(data["thdg"])
+    if platform == "noseboom":
+        theta = np.deg2rad(data["pit"])
+        phi = np.deg2rad(data["roll"])
+        alpha = np.deg2rad(data_corr["alpha"])
+        beta = np.deg2rad(data_corr["beta"])
+        thdg = np.deg2rad(data["thdg"])
+    
+        c1 = 1.65
+        c2 = -0.41
+        c3 = 7.34
+        vrxf = np.deg2rad(c1 * data["pitr"] - c2 * data["yawr"])
+        vryf = np.deg2rad(c3 * data["yawr"] - c1 * data["rolr"])
+        vrzf = np.deg2rad(c2 * data["rolr"] - c3 * data["pitr"])
 
-    c1 = 1.65
-    c2 = -0.41
-    c3 = 7.34
-    vrxf = np.deg2rad(c1 * data["pitr"] - c2 * data["yawr"])
-    vryf = np.deg2rad(c3 * data["yawr"] - c1 * data["rolr"])
-    vrzf = np.deg2rad(c2 * data["rolr"] - c3 * data["pitr"])
-
-    if component == "v":
         vKg = (data_corr["vns_corr"] + 
                vrxf * np.cos(theta) * np.cos(thdg)
                + vryf * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))
                + vrzf * (np.cos(phi) * np.sin(theta) * np.cos(thdg) + np.sin(phi) * np.sin(thdg))
               )
-        vg = (data_corr["tas"] *
-                (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.cos(thdg)
-              + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))
-              + np.sin(alpha) * np.cos(beta) * (np.cos(phi) * np.sin(theta) * np.cos(thdg) + np.sin(phi) * np.sin (thdg))
-                ))
-        out = vKg - vg
-    elif component == "u":
         uKg = (data_corr["vew_corr"]
                + vrxf * np.cos(theta) * np.sin(thdg)
                + vryf * (np.sin(phi) * np.sin(theta) * np.sin(thdg) + np.cos(phi) * np.cos(thdg))
                + vrzf * (np.cos(phi) * np.sin(theta) * np.sin(thdg) - np.sin(phi) * np.cos(thdg))
             )
-        ug = (data_corr["tas"] *
-              (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.sin(thdg)
-               + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.sin(thdg) + np.cos(phi) * np.cos(thdg))
-               + np.sin(alpha) * np.sin(beta) * (np.cos(phi) * np.sin(theta) * np.sin(thdg) - np.sin(phi) * np.cos(thdg))
-             ))
-        out = uKg - ug
-    elif component == "w":
         wKg = (-data_corr["w_ins_corr"]
                - vrzf * np.sin(theta)
                + vryf * np.sin(phi) * np.cos(theta)
                + vrzf * np.cos(phi) * np.cos(theta)
               )
-        wg = (data_corr["tas"] *
+        
+    elif platform == "tbird":
+        theta = np.deg2rad(data["pitch_inat"])
+        phi = np.deg2rad(data["roll_inat"])
+        alpha = np.deg2rad(data_corr["alpha"])
+        beta = np.deg2rad(data_corr["beta"])
+        thdg = np.deg2rad(data["thdg_inat"])
+        ttrk = np.deg2rad(data_corr["tang_track_inat"])
+
+        uKg = 0 #data["gs_inat"] * np.cos(ttrk)
+        vKg = 0 #data["gs_inat"] * np.sin(ttrk)
+        wKg = 0 #- data["h_inat"].diff("time")/0.01
+
+    vg = (data_corr["tas"] *
+                (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.cos(thdg)
+              + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))
+              + np.sin(alpha) * np.cos(beta) * (np.cos(phi) * np.sin(theta) * np.cos(thdg) + np.sin(phi) * np.sin (thdg))
+                ))
+    ug = (data_corr["tas"] *
+              (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.sin(thdg)
+               + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.sin(thdg) + np.cos(phi) * np.cos(thdg))
+               + np.sin(alpha) * np.sin(beta) * (np.cos(phi) * np.sin(theta) * np.sin(thdg) - np.sin(phi) * np.cos(thdg))
+             ))
+    wg = (data_corr["tas"] *
               (-np.cos(alpha) * np.cos(beta) * np.sin(theta)
                + np.sin(beta) * np.sin(phi) * np.cos(theta)
                + np.sin(alpha) * np.cos(beta) * np.cos(phi) * np.cos(theta)
              ))
+
+    if component == "v":       
+        out = vKg - vg
+    elif component == "u":
+        out = uKg - ug
+    elif component == "vertwind":
         out = -wKg + wg
     return out

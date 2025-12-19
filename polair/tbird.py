@@ -4,7 +4,7 @@ import numpy as np
 import xarray as xr
 import pandas as pd
 
-def configure_noseboom_parser(parser):
+def configure_tbird_parser(parser):
     parser.add_argument(
         "-f",
         "--flight",
@@ -43,9 +43,9 @@ def run(args):
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
     fn_in = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
-    fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_noseboom_100Hz.nc"
-    start = config["flights"][flight]["start"]
-    stop = config["flights"][flight]["stop"]
+    fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_tbird_100Hz.nc"
+    start = config["flights"][flight]["start_tbird"]
+    stop = config["flights"][flight]["stop_tbird"]
 
     data = xr.open_dataset(fn_in)
 
@@ -62,18 +62,14 @@ def run(args):
         except:
             data_corr = da.to_dataset()
 
-    w_ins = corr.get_w_ins(data, start, stop)
-    h_ins = corr.get_h_ins(w_ins["w_ins"])
-    data = xr.merge([data, w_ins, h_ins])
-    
-    for v in ["lat", "lon", "gs", "h_ins", "w_ins", "vew", "vns"]:
-        gps_corr = corr.correct_ins_with_gps(data, v)
-        data_corr = xr.merge([data_corr, gps_corr])
+    for a in ["thdg_inat", "ttrk_inat", "mtrk_inat", "roll_inat", "pitch_inat"]:
+        name = f"{a}_corr"
+        da = corr.reverse_antennas(data, a).rename(name)
+        data_corr[name] = da
 
-    ttrk_corr = corr.correct_ttrk_ins_with_gps(data, data_corr, "ttrk")
-    data_corr = xr.merge([data_corr, ttrk_corr])
+    data_corr["tang_track_inat"] = corr.bearing_from_latlon(data.lat_inat, data.lon_inat)
 
-    pf = "noseboom"
+    pf = "tbird"
 
     for v in ["qb", "qc", "ps", "alpha", "beta"]:
         data_corr[v] = corr.alignement_correction(data, fhp_params, v, pf)
@@ -85,13 +81,12 @@ def run(args):
     
     data_corr["tas"] = corr.get_true_air_speed(data_corr, pf)
     
-    hicao = corr.hbaro_icao(data_corr)
-    hbaro = corr.hbaro(data_corr, start, stop, pf)
+    data_corr["lat_corr"] = data.lat_inat # This is only to avoid more complications in the definition of the function deltah
     
     deltah = corr.deltah(data_corr)
     data_corr["h_baro"] = deltah.cumsum("time", skipna=True)
     data_corr["w_baro"] = deltah/0.01
-
+    
     for v in ["u", "v", "vertwind"]:
         wind_comp = corr.get_wind_component(data, data_corr, v, pf)
         data_corr[v] = wind_comp
@@ -100,7 +95,7 @@ def run(args):
     var_list = list(out_vars.keys())
     for v in var_list:
         v_old = out_vars[v]["old"]
-        if out_vars[v]["platform"] in ["noseboom"]:
+        if out_vars[v]["platform"] in ["tbird"]:
             try:
                 var_data = data[[v_old]]
             except:
@@ -110,7 +105,6 @@ def run(args):
                 out_ds = xr.merge([out_ds, var_data])
             except:
                 out_ds = var_data
-            out_ds[v].attrs = {}
             out_ds = h.add_attrs_var(out_ds, v, out_vars)
 
     out_ds.to_netcdf(fn_out)
