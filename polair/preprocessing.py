@@ -32,6 +32,7 @@ def configure_preprocessing_parser(parser):
     parser.set_defaults(func=run)
     
 def run(args):
+    # Preparation like importing config file etc.
     flight = int(args.flight)
     config_file = args.config
     config = h.import_dictionary(config_file)
@@ -46,6 +47,11 @@ def run(args):
     
     # Calibration of the raw data and interpolation to 100 Hz
     var_list = list(vars.keys())
+    if not config["flights"][flight]["tbird"]:
+        var_list = [
+            v for v in var_list
+            if vars[v]["group"] not in ["tbird", "inat"]
+        ]
     for v in var_list:
         old_name = vars[v]["old"]
         fn = f"{config["flights"][flight]["data_dir"]}/{config["flights"][flight]["prefix"]}{old_name}.dat"

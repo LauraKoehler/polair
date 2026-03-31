@@ -3,6 +3,25 @@ import pandas as pd
 import xarray as xr
 
 def cal(v, cal_file, df, fn_prefix, var_dict):
+    """
+    This function calibrates the DMS data and calculates physical values from analog output when necessary.
+
+    Parameters:
+    - v: str
+        Variable to be calibrated
+    - cal_file: dict
+        Dictionary with calibration values for the campaign
+    - df: pandas.DataFrame
+        Dateframe with data to be calibrated
+    - fn_prefix: str
+        Filename prefix for loading the data
+    - var_dict: dict
+        Dictionary with variable information
+
+    Returns:
+    - df: pandas.DataFrame
+        Dataframe with calibrated values of the variable v.
+    """
     if v in ["psT", "psB", "psN"]:
         calibrated=np.interp(df[v],cal_file[v]["TRANSDUCER_OUTPUT"],cal_file[v]["APPLIED_PRESSURE"])
     elif v in ["qaT", "qbT", "qcT", "qcB", "qaN", "qbN", "qcN"]:

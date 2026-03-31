@@ -22,6 +22,28 @@ def sat_correction(ds, t, recovery=1.0):
     da = recovery * temp * (ps / (ps + qs)) ** R_over_cp
     return da
 
+def sat_pressure(temp):
+    '''
+    Saturation pressure from Magnus formula
+
+    temp: temperature
+    '''
+    es = 6.112 * np.exp(17.62 * (temp - 273.15)/(temp - 273.15 + 243.12))
+    return es
+
+def humidity_correction(rh, T_sensor, T_amb):
+    '''
+    Adiabatic correction of relative humidity
+
+    rh: relative humidity from humicap
+    T_sensor: humidity sensor temperature
+    T_amb: ambient temperature
+    '''
+    es_sensor = sat_pressure(T_sensor)
+    es_amb = sat_pressure(T_amb)
+    out = rh * (es_sensor/es_amb)
+    return out
+
 def reverse_antennas(ds, angle, shift = True):
     '''
     if shift = True (default): shifts angle by pi/2, else keep angle 
@@ -276,30 +298,18 @@ def get_wind_component(data, data_corr, component, platform):
         alpha = np.deg2rad(data_corr["alpha"])
         beta = np.deg2rad(data_corr["beta"])
         thdg = np.deg2rad(data["thdg"])
-    
+
+        # Difference between five hole probe and INS, five hole probe seems to be c2 m right, c1 m above, and c3 m in front of the INS (looking from the noseboom to the aircraft)
         c1 = 1.65
         c2 = -0.41
         c3 = 7.34
         vrxf = np.deg2rad(c1 * data["pitr"] - c2 * data["yawr"])
         vryf = np.deg2rad(c3 * data["yawr"] - c1 * data["rolr"])
         vrzf = np.deg2rad(c2 * data["rolr"] - c3 * data["pitr"])
+        vns = data_corr["vns_corr"]
+        vew = data_corr["vew_corr"]
+        vup = -data_corr["w_ins_corr"]
 
-        vKg = (data_corr["vns_corr"] + 
-               vrxf * np.cos(theta) * np.cos(thdg)
-               + vryf * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))
-               + vrzf * (np.cos(phi) * np.sin(theta) * np.cos(thdg) + np.sin(phi) * np.sin(thdg))
-              )
-        uKg = (data_corr["vew_corr"]
-               + vrxf * np.cos(theta) * np.sin(thdg)
-               + vryf * (np.sin(phi) * np.sin(theta) * np.sin(thdg) + np.cos(phi) * np.cos(thdg))
-               + vrzf * (np.cos(phi) * np.sin(theta) * np.sin(thdg) - np.sin(phi) * np.cos(thdg))
-            )
-        wKg = (-data_corr["w_ins_corr"]
-               - vrzf * np.sin(theta)
-               + vryf * np.sin(phi) * np.cos(theta)
-               + vrzf * np.cos(phi) * np.cos(theta)
-              )
-        
     elif platform == "tbird":
         theta = np.deg2rad(data["pitch_inat"])
         phi = np.deg2rad(data["roll_inat"])
@@ -307,11 +317,29 @@ def get_wind_component(data, data_corr, component, platform):
         beta = np.deg2rad(data_corr["beta"])
         thdg = np.deg2rad(data["thdg_inat"])
         ttrk = np.deg2rad(data_corr["tang_track_inat"])
+        
+        vrxf = theta.diff("time")/0.01
+        vryf = phi.diff("time")/0.01
+        vrzf = 0    
+        vns = data["gs_inat"] * np.cos(thdg)
+        vew = data["gs_inat"] * np.sin(thdg)
+        vup = 0 #- data["h_inat"].diff("time")/0.01
 
-        uKg = 0 #data["gs_inat"] * np.cos(ttrk)
-        vKg = 0 #data["gs_inat"] * np.sin(ttrk)
-        wKg = 0 #- data["h_inat"].diff("time")/0.01
-
+    vKg = (vns + 
+           vrxf * np.cos(theta) * np.cos(thdg)
+           + vryf * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))
+           + vrzf * (np.cos(phi) * np.sin(theta) * np.cos(thdg) + np.sin(phi) * np.sin(thdg))
+          )
+    uKg = (vew
+           + vrxf * np.cos(theta) * np.sin(thdg)
+           + vryf * (np.sin(phi) * np.sin(theta) * np.sin(thdg) + np.cos(phi) * np.cos(thdg))
+           + vrzf * (np.cos(phi) * np.sin(theta) * np.sin(thdg) - np.sin(phi) * np.cos(thdg))
+        )
+    wKg = (vup
+           - vrxf * np.sin(theta)
+           + vryf * np.sin(phi) * np.cos(theta)
+           + vrzf * np.cos(phi) * np.cos(theta)
+          )
     vg = (data_corr["tas"] *
                 (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.cos(thdg)
               + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))

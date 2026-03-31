@@ -14,6 +14,14 @@ def import_dictionary(yaml_file):
     The config file contains:
     - campaign information
     - Paths to xml-file, data
+
+    Parameters:
+    - yaml_file: .yaml file 
+        Dictionary containing basic information about the campaign
+
+    Returns:
+    - dict
+        The config file as dictionary
     """
     try:
         with open(yaml_file, "r") as f:
@@ -23,6 +31,15 @@ def import_dictionary(yaml_file):
         print("yaml file not found!!!")
 
 def add2logfile(logfile, text):
+    """
+    Writes text in the logfile
+
+    Parameters:
+    - logfile: .txt file
+        Logfile for the processing, location defined in the config file
+    - text: str
+        Text which should be added to the logfile
+    """
     with logfile.open("a") as f:
         f.write(text+"\n")
 
@@ -30,6 +47,14 @@ def create_logfile(config):
     """
     Check if processing log file already exists, if not, create it, print date and time
     The config file needs to contain the path information of the log file.
+
+    Paramters:
+    - config: dict
+        Configuration dictionary
+
+    Returns:
+    - logfile: str
+        Path to logfile
     """
     fn = config["paths"]["processing_log_file"]+"turbulence_processing_log.txt"
     logfile = Path(fn)
@@ -49,6 +74,14 @@ def get_variable_names(xml_file):
     - DMS filenames depend on the device configuration during specific flights or campaigns.
     - This function reads an XML order file (e.g., 'RAD_flightname.xml') and extracts
       variable names based on <channel> tags that include 'deviceShortName' and 'channelShortName'.
+
+    Paramters:
+    - xml_file: str
+        Location of the xml file, should be included in the config
+
+    Returns:
+    - variable_names: list
+        List with all variable names in the xml file.
     """
     try:
         # Read the entire file as text
@@ -76,6 +109,18 @@ def get_variable_names(xml_file):
 def import_data(v, config, flight):
     """
     Import file for single variable using path and prefix for the specific flight from config file
+
+    Parameters:
+    - v: str
+        Variable name
+    - config: dict
+        Configuration dictionary
+    - flight: int
+        Flight number
+
+    Returns:
+    - df: pandas.DataFrame
+        Dataframe with time and variable data.
     """
     old_name = vars[v]["old"]
     fn = f"{config["flights"][flight]["data_dir"]}/{config["flights"][flight]["prefix"]}{old_name}.dat"
@@ -85,6 +130,14 @@ def import_data(v, config, flight):
 def get_timestamps(df):
     """
     Repair timestamps to datetime64 datetimes
+
+    Parameters:
+    - df: pandas.DataFrame
+        Dataframe with times and data imported from the DMS download.
+
+    Returns:
+    - df: pandas.DataFrame
+        Dataframe with the same data but datetime64 timestamps.
     """
     dates_fixed = np.array([d.replace('/', '-') for d in df["date"]], dtype=object)
     times = (dates_fixed+"T" +df["time"].values).astype("datetime64[ns]")
@@ -94,7 +147,17 @@ def get_timestamps(df):
 def check_sampling(df, v, var_dict, logfile):
     """
     Check if sampling interval in df['time'] matches expected_sampling (seconds).
-    95% of samples should match within tolerance.
+    95% of samples should match within tolerance. Identified gaps and sampling issues are written in the logfile.
+
+    Parameters:
+    - df: pandas.DataFrame
+        Dataframe with data
+    - v: str
+        Variable name
+    - var_dict: dict
+        Dictionary with varible information
+    - logfile: str
+        Logfile path
     """
     expected_sampling = var_dict[v]["raw_sampling_time"]
     dt = df["time"].diff().dt.total_seconds().iloc[1:]
@@ -121,19 +184,17 @@ def find_gaps(df, v, var_dict, logfile, gap_factor=2.0):
     Find data gaps in a time series based on sampling interval.
     
     Parameters
-    ----------
-    df : pandas.DataFrame
+    - df : pandas.DataFrame
         Must contain a 'time' column of datetime64.
-    v: variable
+    - v: str
         Variable of the dataframe.
-    var_dict : dictionary
+    - var_dict : dictionary
         Inlcudes raw_sampling_time for each variable.
-    gap_factor : float, optional
+    - gap_factor : float, optional
         Threshold factor (default 2.0).
     
     Returns
-    -------
-    pandas.DataFrame
+    - pandas.DataFrame
         Each row is a gap interval: [start_time, end_time, gap_duration].
     """
     expected_sampling = var_dict[v]["raw_sampling_time"]
@@ -162,11 +223,21 @@ def find_gaps(df, v, var_dict, logfile, gap_factor=2.0):
 
 def interpolate_time(df, v, var_dict, steps = 0.01):
     """
-    Linearly interpolate time on common timestamps with 100 Hz (or choose accordingly), convert to xarray dataset
+    Linearly interpolate time on common timestamps with 100 Hz (or choose accordingly), convert to xarray dataset.
 
-    df: pandas dataframe
-    steps: optional
-        Frequency specification given in s, default is 100 Hz, i.e. 0.01 s
+    Paramters:
+    - df: pandas.DataFrame
+        Dataframe containing data.
+    - v: str
+        Variable name
+    - var_dict: dict
+        Dictionary containing variable information. It should be specified in the config file.
+    - steps: float
+        Optional, frequency specification given in s, default is 100 Hz, i.e. 0.01 s
+
+    Returns:
+    - ds: xarray.Dataset
+        Dataset interpolated to step frequency, default is 100 Hz.
     """
     if type(df[v].values[-1]) == np.datetime64:
         ds = xr.Dataset(coords = {"time": df["time"]}, data_vars = {v: ("time", df[v].values)})
@@ -187,10 +258,18 @@ def interpolate_time(df, v, var_dict, steps = 0.01):
 def add_attrs_var(ds, v, var_dict):
     """
     This function adds all attributes from the variable dictrionary except for the old name which is only necessary to read in the correct file. It adds the original unit because no unit conversion is done so far.
-    
-    ds: xarray dataset
-    v: variable for which attributes are added
-    var_dict: dictionary with all the information for each parameter
+
+    Parameters:
+    - ds: xarray.Dataset
+        Input dataset
+    - v: str 
+        Variable for which attributes are added
+    - var_dict: dict
+        Dictionary with all the information for each parameter
+
+    Returns:
+    - ds: xarray.Dataset
+        Dataset with added attributes.
     """
     attrs = var_dict[v]
     for at in list(attrs.keys()):
@@ -208,9 +287,13 @@ def add_global_attrs(ds, config, flight):
     """
     This function adds metadata to the data set as stated in the config file
 
-    ds: data set
-    config: config file
-    flight: research flight which is processed
+    Parameters:
+    - ds: xarray.Dataset
+        Input data set
+    - config: dict
+        config file containing campaign information
+    - flight: int
+        research flight which is processed
     """
     attrs = config["metadata"]
     ds.attrs = attrs
@@ -219,6 +302,21 @@ def add_global_attrs(ds, config, flight):
     return ds
 
 def convert_unit(ds, var_dict, v):
+    """
+    This function converts the unit from the original unit to the final (SI) unit specified in the variable information
+
+    Parameters:
+    - ds: xarray.Dataset
+        Input dataset
+    - var_dict: dict
+        Dictionary with variable (unit) information
+    - v: str
+        Variable for which unit should be converted
+
+    Returns:
+    - ds: xarray.Dataset
+        Dataset with converted units
+    """
     if not v in ["t_inat_gpgga", "t_inat_piahs", "t_gpgga", "t_gprmc"]:
         unit_old = str(var_dict[v]["units_old"])
         unit_new = str(var_dict[v]["units"])
@@ -234,8 +332,15 @@ def g_welmec(lat, h):
     '''
     ratio of gravitational acceleration according to Welmec-Formula devided by 9.81
 
-    lat: latitude in degree
-    h: height above sea level in m
+    Parameters:
+    - lat: xarray.DataArray
+        Latitude in degree
+    - h: xarray.DataArray
+        height above sea level in m
+
+    Returns:
+    - g_ratio: xarray.DataArray
+        Dataarray with latitude and height dependent values of g.
     '''
-    g_ratio = (9.780318 * (1 + 0.0053024 * np.sin(np.deg2rad(lat))**2 - 0.0000058 * np.sin(2*np.deg2rad(lat))) - 0.000003085 * h)
+    g_ratio = (9.780318 * (1 + 0.0053024 * np.sin(np.deg2rad(lat))**2 - 0.0000058 * np.sin(2*np.deg2rad(lat))**2) - 0.000003085 * h)
     return g_ratio
