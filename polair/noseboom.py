@@ -49,18 +49,37 @@ def run(args):
 
     data = xr.open_dataset(fn_in)
 
+    # Calibration of the pressures. For this, the calibration segments are used and the calibration factors are saved in fhp_params. The calibration has to be performed manually. Use the jupyter notebook Get_segments.ipynb.
+    pf = "noseboom"
+
+    for v in ["qb", "qc", "ps", "alpha", "beta"]:
+        da = corr.alignement_correction(data, fhp_params, v, pf).rename(v)
+        try:
+            data_corr[v] = da
+        except:
+            data_corr = da.to_dataset()
+    
+    # Some corrections:
+    data_corr["qc"] = data_corr["qc"].where(data_corr["qc"]>0, other = 0)
+    data_corr["alpha"] = data_corr["alpha"].where(data_corr["qc"]>500, other = 0)
+    data_corr["beta"] = data_corr["beta"].where(data_corr["qc"]>500, other = 0)
+    
     # adiabatic corrections for sensors in Rosemount/Goodrich housings
     etaE = 1.00025  # recovery factor for deiced sensors
-    for temp in ["Te_T", "TejB", "ThuB", "Te_N", "ThuN", "TejN"]:
+    for temp in ["TejB", "ThuB", "Te_N", "ThuN", "TejN"]:
         name = f"{temp}_corr"
         if temp == "TejB":
-            da = corr.sat_correction(data, temp, recovery=etaE).rename(name)
+            da = corr.sat_correction(data, data_corr, temp, recovery=etaE).rename(name)
         else:
-            da = corr.sat_correction(data, temp).rename(name)
+            da = corr.sat_correction(data, data_corr, temp).rename(name)
         try:
             data_corr[name] = da
         except:
             data_corr = da.to_dataset()
+
+    # Correct relative humidity using the Magnus formula for the saturation pressure.
+    rh_corr = corr.humidity_correction(data.rFHuN, data.ThuN, data_corr.Te_N_corr)
+    data_corr["rFHuN_corr"] = rh_corr
 
     w_ins = corr.get_w_ins(data, start, stop)
     h_ins = corr.get_h_ins(w_ins["w_ins"])
@@ -72,16 +91,6 @@ def run(args):
 
     ttrk_corr = corr.correct_ttrk_ins_with_gps(data, data_corr, "ttrk")
     data_corr = xr.merge([data_corr, ttrk_corr])
-
-    pf = "noseboom"
-
-    for v in ["qb", "qc", "ps", "alpha", "beta"]:
-        data_corr[v] = corr.alignement_correction(data, fhp_params, v, pf)
-    
-    # Some corrections:
-    data_corr["qc"] = data_corr["qc"].where(data_corr["qc"]>0, other = 0)
-    data_corr["alpha"] = data_corr["alpha"].where(data_corr["qc"]>500, other = 0)
-    data_corr["beta"] = data_corr["beta"].where(data_corr["qc"]>500, other = 0)
     
     data_corr["tas"] = corr.get_true_air_speed(data_corr, pf)
     

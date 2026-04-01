@@ -4,41 +4,61 @@ import xarray as xr
 import scipy.signal as sig
 from . import _helpers as h
 
-def sat_correction(ds, t, recovery=1.0):
+def sat_correction(ds, ds_corr, t, recovery=1.0):
     """
     Compute static air temperature from TAT using adiabatic correction.
-    t, ps, qc must be xarray.DataArray.
     Recovery is a correction for deiced sensor, in this case recovery=1.00025
 
-    ds: dataset with all variables
-    t: temperature name (str)
+    Paramters:
+    - ds: xarray.Dataset
+        dataset with all variables
+    - t: str
+        temperature name
+        
+    Returns:
+    - da: xarray.DataArray
+        DataArray with corrected temperature
     """
-    ps_dict = {"Te_T": "psT", "TejB": "psB", "ThuB": "psB", "Te_N": "psN", "ThuN": "psN", "TejN": "psN"} # corresponding static pressures
-    qs_dict = {"Te_T": "qcT", "TejB": "qcB", "ThuB": "qcB", "Te_N": "qcN", "ThuN": "qcN", "TejN": "qcN"} # corresponding dynamic pressures
+    ps_dict = {"Te_T": "psT", "TejB": "psB", "ThuB": "psB", "Te_N": "ps", "ThuN": "ps", "TejN": "ps"} # corresponding static pressures
+    qs_dict = {"Te_T": "qcT", "TejB": "qcB", "ThuB": "qcB", "Te_N": "qc", "ThuN": "qc", "TejN": "qc"} # corresponding dynamic pressures
     R_over_cp = 0.2858964
     temp = ds[t]
-    ps = ds[ps_dict[t]]
-    qs = ds[qs_dict[t]]
+    if t in ["Te_N", "ThuN", "TejN"]:
+        ps = ds_corr[ps_dict[t]]
+        qs = ds_corr[qs_dict[t]]
+    else:
+        ps = ds[ps_dict[t]]
+        qs = ds[qs_dict[t]]
     da = recovery * temp * (ps / (ps + qs)) ** R_over_cp
     return da
 
 def sat_pressure(temp):
-    '''
-    Saturation pressure from Magnus formula
+    """
+    Saturation pressure from Magnus formula.
 
-    temp: temperature
-    '''
-    es = 6.112 * np.exp(17.62 * (temp - 273.15)/(temp - 273.15 + 243.12))
+    Parameters:
+    - temp: xarray.DataArray
+        temperature
+
+    Returns:
+    - es: xarray.DataArray
+        saturation pressure
+    """
+    es = 6.1094 * np.exp(17.625 * (temp - 273.15)/(temp - 273.15 + 243.04))
     return es
 
 def humidity_correction(rh, T_sensor, T_amb):
-    '''
+    """
     Adiabatic correction of relative humidity
 
-    rh: relative humidity from humicap
-    T_sensor: humidity sensor temperature
-    T_amb: ambient temperature
-    '''
+    Parameters:
+    - rh: xarray.DataArray
+        relative humidity from humicap
+    - T_sensor: xarray.DataArray
+        humidity sensor temperature
+    - T_amb: xarray.DataArray
+        ambient temperature
+    """
     es_sensor = sat_pressure(T_sensor)
     es_amb = sat_pressure(T_amb)
     out = rh * (es_sensor/es_amb)
@@ -96,12 +116,21 @@ def bearing_from_latlon(lat, lon):
 
 def get_w_ins(data, start, stop, deltat = 0.01):
     '''
-    Calculate w from vertial acceleration from the INS
+    Calculate w from vertial acceleration from the INS and remove Schuler oscillation.
 
-    data: calibrated data
-    start: start of the flight (from config)
-    stop: end of the flight (from config)
-    deltat: sampling rate in s (should be 0.01 for 100 Hz data)
+    Parameters:
+    - data: xarrau.Dataset
+        calibrated data
+    - start: numpy.datetime64
+        start of the flight (from config)
+    - stop: numpy.datetime64
+        end of the flight (from config)
+    - deltat: float
+        sampling rate in s (should be 0.01 for 100 Hz data)
+
+    Returns:
+    - w_ins_hp: xarray.Dataset
+        Vertical velocity from INS
     '''
     w_ins = deltat * data["azg"].sel(time = slice(start, stop)).cumsum(dim = "time")
     # Remove Schuler oscillation
@@ -119,9 +148,16 @@ def get_w_ins(data, start, stop, deltat = 0.01):
 def get_h_ins(w, deltat = 0.01):
     '''
     Get the height from vertical acceleration and velocity
-    
-    w: vertical velocity
-    deltat: sampling rate in s (should be 0.01 for 100 Hz data)
+
+    Parameters:
+    - w: xarray.Dataset
+        vertical velocity
+    - deltat: float
+        sampling rate in s (should be 0.01 for 100 Hz data)
+
+    Returns:
+    - h: xarray.Dataset
+        Aircraft altitude from INS
     '''
     h = (w * deltat).cumsum()
     h = h.to_dataset(name = "h_ins")
@@ -131,8 +167,15 @@ def correct_ins_with_gps(data, v):
     '''
     INS stabilization with GPS
 
-    data: 100 Hz data
-    v: variable, options: lon, lat, gs, h_ins, w_ins, vew, vns
+    Parameters:
+    - data: xarray.Dataset
+        100 Hz calibrated data
+    - v: str
+        variable, options: lon, lat, gs, h_ins, w_ins, vew, vns
+
+    Returns:
+    - corrected: xarray.Dataset
+        GPS corrected data
     '''
     gps_var = {"lon": "lon_gprmc",
               "lat": "lat_gprmc",
@@ -158,9 +201,17 @@ def correct_ttrk_ins_with_gps(data, data_corr, v):
     '''
     True heading correction from INS by GPS
 
-    data: 100 Hz calibrated data
-    data_corr: GPS corrected data calculated with correct_ins_with_gps
-    v: variable, options: ttrk
+    Parameters:
+    - data: xarray.Dataset
+        100 Hz calibrated data
+    - data_corr: xarray.Dataset
+        GPS corrected data calculated with correct_ins_with_gps
+    - v: str
+        variable, options: ttrk
+
+    Returns:
+    - corrected: xarray.Dataset
+        GPS corrected data
     '''
     gps_var = {"ttrk": "ttrk_bestvel"}
     gps_v = gps_var[v]
@@ -185,11 +236,19 @@ def correct_ttrk_ins_with_gps(data, data_corr, v):
 
 def alignement_correction(data, fhp_params, v, platform):
     '''
-    Alignemnet corrections from mounting of the noseboom/t-bird
+    Alignemnet corrections from mounting of the noseboom/t-bird. The used parameters are determined from the calibration segments with a manual evaluation.
 
-    data: 100 Hz calibrated data
-    fhb_params: dictionary with parameters for the five hole probes
-    platform: noseboom or tbird
+    Paramters:
+    - data: xarray.Dataset
+        100 Hz calibrated data
+    - fhb_params: dict
+        dictionary with parameters for the five hole probes
+    - platform: str
+        noseboom or tbird
+
+    Returns:
+    - out: xarray.DataArray
+        Dataset with corrected values.
     '''
     a0 = fhp_params[platform][v]["a0"]
     a1_qb = fhp_params[platform][v]["a1_qb"]
