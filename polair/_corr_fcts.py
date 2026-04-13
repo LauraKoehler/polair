@@ -58,19 +58,32 @@ def humidity_correction(rh, T_sensor, T_amb):
         humidity sensor temperature
     - T_amb: xarray.DataArray
         ambient temperature
+
+    Returns:
+    - out: xarray.DataArray
+        corrected relative humidity
     """
     es_sensor = sat_pressure(T_sensor)
     es_amb = sat_pressure(T_amb)
     out = rh * (es_sensor/es_amb)
     return out
 
-def reverse_antennas(ds, angle, shift = True):
+def reverse_antennas(ds, angle, shift):
     '''
-    if shift = True (default): shifts angle by pi/2, else keep angle 
+    if shift = True: shifts angle by pi/2, else keep angle 
     (possible reason: switched antennas in iNAT)
-    
-    ds: data set
-    angle: 
+
+    Parameters:
+    - ds: xarray.Dataset
+        calibrated data
+    - angle: str
+        angle to be switched
+    - shift: bool
+        options: True or False
+
+    Returns:
+    - da: xarray.DataArray
+        shifted data if shift = True, else unchanged data
     '''
     if shift:
         delta = 180
@@ -81,37 +94,7 @@ def reverse_antennas(ds, angle, shift = True):
     if angle in ["roll_inat", "pitch_inat"]:
         da = sign * ds[angle]
     else:
-        da = (ds[angle] + delta) % 360
-    return da
-
-def bearing_from_latlon(lat, lon):
-    """
-    Compute bearing between consecutive lat/lon points.
-    lat, lon must be 1-D xarray DataArrays in degrees.
-    Returns a DataArray of same length with first element NaN.
-    """
-    
-    # Convert to radians
-    lons = np.deg2rad(lon)
-    lats = np.deg2rad(lat)
-
-    # Differences
-    dlon = lons.diff("time").values
-    lat1 = lats.isel(time=slice(None, -1)).values
-    lat2 = lats.isel(time=slice(1, None)).values
-
-    # Bearing formula
-    x = np.sin(dlon) * np.cos(lat2)
-    y = np.cos(lat1) * np.sin(lat2) - np.sin(lat1) * np.cos(lat2) * np.cos(dlon)
-    
-    bearing = np.arctan2(x, y)
-
-    # Convert to degrees and normalize to [0, 360)
-    bearing = (np.rad2deg(bearing) + 360) % 360
-    bearing = np.append(bearing, np.array([np.nan]))
-
-    da = xr.DataArray(data = bearing, dims=["time"], coords = {"time": (["time"], lat.time.values)})
-    
+        da = (ds[angle] + delta)
     return da
 
 def get_w_ins(data, start, stop, deltat = 0.01):
@@ -343,19 +326,29 @@ def get_wind_component(data, data_corr, component, platform):
         vup = data_corr["w_ins_corr"]
 
     elif platform == "tbird":
-        theta = np.deg2rad(data["pitch_inat"])
-        phi = np.deg2rad(data["roll_inat"])
+        theta = np.deg2rad(data_corr["pitch_inat_corr"])
+        theta_rate = theta.diff("time")/0.01
+        phi = np.deg2rad(data_corr["roll_inat_corr"])
+        phi_rate = phi.diff("time")/0.01
         alpha = np.deg2rad(data_corr["alpha"])
         beta = np.deg2rad(data_corr["beta"])
-        thdg = np.deg2rad(data["thdg_inat"])
-        ttrk = np.deg2rad(data_corr["tang_track_inat"])
-        
-        vrxf = theta.diff("time")/0.01
-        vryf = phi.diff("time")/0.01
-        vrzf = 0    
+        thdg = np.deg2rad(data_corr["thdg_inat_corr"])
+        thdg_unwrapped = xr.DataArray(
+            np.unwrap(thdg.values),
+            dims=thdg.dims,
+            coords=thdg.coords
+        )
+        psi_rate = -thdg_unwrapped.diff("time")/0.01
+
+        c1 = 0.0
+        c2 = 0.0
+        c3 = 1.5
+        vrxf = c1 * theta_rate - c2 * psi_rate
+        vryf = c3 * psi_rate - c1 * phi_rate
+        vrzf = c2 * phi_rate - c3 * theta_rate
         vns = data["gs_inat"] * np.cos(thdg)
         vew = data["gs_inat"] * np.sin(thdg)
-        vup = 0 #- data["h_inat"].diff("time")/0.01
+        vup = data["h_inat"].diff("time")/0.01
 
     uKg = (vew
            + vrxf * np.cos(theta) * np.sin(thdg)
