@@ -81,6 +81,7 @@ def run(args):
     rh_corr = corr.humidity_correction(data.rFHuN, data.ThuN, data_corr.Te_N_corr)
     data_corr["rFHuN_corr"] = rh_corr
 
+    # Correction of INS with GPS
     w_ins = corr.get_w_ins(data, start, stop)
     h_ins = corr.get_h_ins(w_ins["w_ins"])
     data = xr.merge([data, w_ins, h_ins])
@@ -91,20 +92,16 @@ def run(args):
 
     ttrk_corr = corr.correct_ttrk_ins_with_gps(data, data_corr, "ttrk")
     data_corr = xr.merge([data_corr, ttrk_corr])
-    
-    data_corr["tas"] = corr.get_true_air_speed(data_corr, pf)
-    
-    hicao = corr.hbaro_icao(data_corr)
-    hbaro = corr.hbaro(data_corr, start, stop, pf)
-    
-    deltah = corr.deltah(data_corr)
-    data_corr["h_baro"] = deltah.cumsum("time", skipna=True)
-    data_corr["w_baro"] = deltah/0.01
 
+    # Calculate true airspeed
+    data_corr["tas"] = corr.get_true_air_speed(data_corr, pf)
+
+    # Determine wind components
     for v in ["u", "v", "vertwind"]:
         wind_comp = corr.get_wind_component(data, data_corr, v, pf)
         data_corr[v] = wind_comp
 
+    # Cleaning up and prepare the output dataset
     out_vars = out_vars[pf]
     var_list = list(out_vars.keys())
     for v in var_list:

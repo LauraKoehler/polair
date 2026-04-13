@@ -285,71 +285,44 @@ def get_true_air_speed(data, platform):
     '''
     Calculate true air speed from air density
 
-    data: data with corrected variables (adiabatic corrected Te_N_corr and ps)
+    Parameters:
+    - data: xarray.Dataset
+        data with corrected variables (adiabatic corrected Te_N_corr and ps)
+    - platform: str
+        options: noseboom or tbird
+
+    Returns:
+    - tas: xarray.DataArray
+        true airspeed
     '''
     if platform == "noseboom":
         temp = "Te_N_corr"
+        pres = "ps"
     elif platform == "tbird":
         temp = "Te_T_corr"
-    Rs = 287.058
-    rho = data.ps / (Rs * data[temp])
+        pres = "ps"
+    Rs = 287.0528
+    rho = data[pres] / (Rs * data[temp])
     tas = np.sqrt(2 * data.qc/rho)
     return tas
-
-def hbaro_icao(data):
-    '''
-    Barometric height from ICAO standard atmosphere
-
-    data: data with ps
-    '''
-    T0 = 288.15
-    L = 0.0065
-    p0 = 101315
-    R = 287.05287
-    g = 9.80665
-    h = T0/L * ((data.ps/p0)**(-R * L / g) -1)
-    return h
-
-def hbaro(data, start, stop, platform):
-    '''
-    Get barometric pressure from pressure and temperature
-
-    data: dataset with ps and Te_N_corr
-    config: config file defining start and stop of the flight
-    '''
-    if platform == "noseboom":
-        t_air = "Te_N_corr"
-    elif platform == "tbird":
-        t_air = "Te_T_corr"
-    Rs = 287.058
-    hicao = hbaro_icao(data)
-    g = h.g_welmec(data.lat_corr, hicao)
-    deltap = data.ps.diff("time")
-    deltah = (- Rs * data[t_air] * deltap)/ (data.ps * g)
-    hbaro = deltah.sel(time = slice(start, stop)).cumsum()
-    return hbaro
-
-def deltah(data):
-    '''
-    height differences from pressure. It includes a rolling mean over 10 s to reduce the noice from the ps sensors.
-
-    data: dataset including ps and Te_N_corr
-    '''
-    Rs = 287.058
-    hicao = hbaro_icao(data)
-    g = h.g_welmec(data.lat_corr, hicao)
-    p = data.ps.rolling(time = 1000).mean()
-    deltah = (- Rs * data.Te_N_corr * p.diff("time"))/ (p * g)
-    return deltah
 
 def get_wind_component(data, data_corr, component, platform):
     '''
     Get wind components from calibrated raw data and corrected data
 
-    data: dataset with raw data
-    data_corr: dataset with corrected data
-    component: wind component, options "u", "v", "vertwind"
-    platform: noseboom or tbird
+    Parameters:
+    - data: xarray.Dataset
+        dataset with raw data
+    - data_corr: xarray.Dataset
+        dataset with corrected data
+    - component: str
+        wind component, options "u", "v", "vertwind"
+    - platform: str
+        options: noseboom or tbird
+
+    Returns:
+    - out: xarray.Dataset
+        wind component
     '''
     if platform == "noseboom":
         theta = np.deg2rad(data["pit"])
@@ -367,7 +340,7 @@ def get_wind_component(data, data_corr, component, platform):
         vrzf = np.deg2rad(c2 * data["rolr"] - c3 * data["pitr"])
         vns = data_corr["vns_corr"]
         vew = data_corr["vew_corr"]
-        vup = -data_corr["w_ins_corr"]
+        vup = data_corr["w_ins_corr"]
 
     elif platform == "tbird":
         theta = np.deg2rad(data["pitch_inat"])
@@ -384,41 +357,41 @@ def get_wind_component(data, data_corr, component, platform):
         vew = data["gs_inat"] * np.sin(thdg)
         vup = 0 #- data["h_inat"].diff("time")/0.01
 
-    vKg = (vns + 
-           vrxf * np.cos(theta) * np.cos(thdg)
-           + vryf * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))
-           + vrzf * (np.cos(phi) * np.sin(theta) * np.cos(thdg) + np.sin(phi) * np.sin(thdg))
-          )
     uKg = (vew
            + vrxf * np.cos(theta) * np.sin(thdg)
            + vryf * (np.sin(phi) * np.sin(theta) * np.sin(thdg) + np.cos(phi) * np.cos(thdg))
            + vrzf * (np.cos(phi) * np.sin(theta) * np.sin(thdg) - np.sin(phi) * np.cos(thdg))
         )
-    wKg = (vup
-           - vrxf * np.sin(theta)
-           + vryf * np.sin(phi) * np.cos(theta)
-           + vrzf * np.cos(phi) * np.cos(theta)
+    vKg = (vns + 
+           vrxf * np.cos(theta) * np.cos(thdg)
+           + vryf * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))
+           + vrzf * (np.cos(phi) * np.sin(theta) * np.cos(thdg) + np.sin(phi) * np.sin(thdg))
           )
+    wKg = (vup
+           + vrxf * np.sin(theta)
+           - vryf * np.sin(phi) * np.cos(theta)
+           - vrzf * np.cos(phi) * np.cos(theta)
+          )
+    ug = (data_corr["tas"] *
+              (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.sin(thdg)
+               + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.sin(thdg) + np.cos(phi) * np.cos(thdg))
+               + np.sin(alpha) * np.cos(beta) * (np.cos(phi) * np.sin(theta) * np.sin(thdg) - np.sin(phi) * np.cos(thdg))
+             ))
     vg = (data_corr["tas"] *
                 (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.cos(thdg)
               + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))
               + np.sin(alpha) * np.cos(beta) * (np.cos(phi) * np.sin(theta) * np.cos(thdg) + np.sin(phi) * np.sin (thdg))
                 ))
-    ug = (data_corr["tas"] *
-              (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.sin(thdg)
-               + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.sin(thdg) + np.cos(phi) * np.cos(thdg))
-               + np.sin(alpha) * np.sin(beta) * (np.cos(phi) * np.sin(theta) * np.sin(thdg) - np.sin(phi) * np.cos(thdg))
-             ))
-    wg = (data_corr["tas"] *
+    wg = -(data_corr["tas"] *
               (-np.cos(alpha) * np.cos(beta) * np.sin(theta)
                + np.sin(beta) * np.sin(phi) * np.cos(theta)
                + np.sin(alpha) * np.cos(beta) * np.cos(phi) * np.cos(theta)
              ))
 
-    if component == "v":       
+    if component == "u":       
+        out = uKg  - ug
+    elif component == "v":
         out = vKg - vg
-    elif component == "u":
-        out = uKg - ug
     elif component == "vertwind":
-        out = -wKg + wg
+        out = wKg - wg
     return out
