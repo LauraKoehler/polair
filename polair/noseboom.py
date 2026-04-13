@@ -46,6 +46,7 @@ def run(args):
     fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_noseboom_100Hz.nc"
     start = config["flights"][flight]["start"]
     stop = config["flights"][flight]["stop"]
+    h.add2logfile(logfile, f"Noseboom: {config["campaign"]["name"]}, flight {flight}, {flight_date}")
 
     data = xr.open_dataset(fn_in)
 

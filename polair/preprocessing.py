@@ -44,6 +44,7 @@ def run(args):
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
     fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
+    h.add2logfile(logfile, f"Preprocessing: {config["campaign"]["name"]}, flight {flight}, {flight_date}")
     
     # Calibration of the raw data and interpolation to 100 Hz
     var_list = list(vars.keys())
