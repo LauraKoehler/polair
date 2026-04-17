@@ -1,19 +1,24 @@
 # polair
 
+This package provides a command line tool for processing atmospheric data from the polar research aircrafts Polar 5 and 6. It can be used to process data downloaded from the [DMS](https://dms.awi.de/exportdisplay/) system, convert the values to physical quantities, calibrate, and homogenise the time stamp. Furthermore, it can be used to process the noseboom and the t-bird to obtain corrected physical variables including the wind components. As a final step, it can be used to create standardised netCDF data sets with metadata and flight information. For this, we recommend to document all information needed to process a specific campaign in a dedicated repository. To use the polair package, you need to provide a configuration file with information of the campaign and several yaml dictionaries with information on calibration, variables of interest, units, flight segments, and so on. The BACSAM II campaign repository can serve as a blueprint.
+
 ## preprocessing
 
+The preprocessing command converts all data in physical quantities. If necessary and provided, it calibrates the data. Finally, they are interpolated on common (default 100 Hz) time stamps. The command also checks for data gaps and sampling errors which are noted in the log file. The calibrated raw data will be saved as a netCDF file. The location needs to be specified in the configuration file of the campaign
 ```
 polair preprocessing -f <flight number> -c <config file>
 ```
 
 ## noseboom
 
+The noseboom command determines the basic meteorological parameters from the calibrated raw data of the noseboom which can be mounted at the nose of Polar 5 and 6. Adiabatic corrections are used and the wind components are determined.
 ```
 polair noseboom -f <flight number> -c <config file>
 ```
 
 ## tbird
 
+The tbird command determines the meteorological parameters from the T-Bird similar to the noseboom command.
 ```
 polair tbird -f <flight number> -c <config file>
 ```
