@@ -1,3 +1,13 @@
+"""
+titile: preprocessing.py
+author: Laura Köhler
+institution: Alfred-Wegener-Institut, Bremerhaven, Germany
+contact: laura.koehler@awi.de
+date: 2026-04-17
+content: preprocessing command to convert all data to physical, calibrated values
+comment: part of polair package
+"""
+
 from . import _helpers as h
 from . import _calibration as calibration 
 import numpy as np

@@ -1,3 +1,13 @@
+"""
+titile: _calibration.py
+author: Laura Köhler
+institution: Alfred-Wegener-Institut, Bremerhaven, Germany
+contact: laura.koehler@awi.de
+date: 2026-04-17
+content: defintion of DMS output calibration function
+comment: part of polair package
+"""
+
 import numpy as np
 import pandas as pd
 import xarray as xr

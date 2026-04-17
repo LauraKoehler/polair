@@ -1,3 +1,13 @@
+"""
+titile: noseboom.py
+author: Laura Köhler
+institution: Alfred-Wegener-Institut, Bremerhaven, Germany
+contact: laura.koehler@awi.de
+date: 2026-04-17
+content: noseboom processing command
+comment: part of polair package
+"""
+
 from . import _helpers as h
 from . import _corr_fcts as corr 
 import numpy as np
