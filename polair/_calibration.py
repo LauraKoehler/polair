@@ -35,7 +35,7 @@ def cal(v, cal_file, df, fn_prefix, var_dict):
     if v in ["psT", "psB", "psN"]:
         calibrated=np.interp(df[v],cal_file[v]["TRANSDUCER_OUTPUT"],cal_file[v]["APPLIED_PRESSURE"])
     elif v in ["qaT", "qbT", "qcT", "qcB", "qaN", "qbN", "qcN"]:
-        calibrated=np.interp(df[v],cal_file[v]["TRANSDUCER_OUTPUT"],cal_file[v]["APPLIED_PRESSURE"]) * 2.4884
+        calibrated=np.interp(df[v],cal_file[v]["TRANSDUCER_OUTPUT"],cal_file[v]["APPLIED_PRESSURE"]) * 2.4884 # factor for WC in hPa
     elif v in ["Te_T", "TejB", "ThuB", "rFHuB", "pssB", "TejN", "Te_N", "ThuN", "rFHuN", "pssN", 
                "Pyau", "Pyao", "Pygu", "Pygo", 
                "axf", "ayf", "azf", "pitr", "rolr", "yawr", "pit", "roll", "thdg", "vew", "vns", "w", "lon", "lat", "h", "azg", "ttrk", "gs"]:
