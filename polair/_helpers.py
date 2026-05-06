@@ -38,7 +38,7 @@ def import_dictionary(yaml_file):
             config = yaml.safe_load(f)
         return config
     except:
-        print("yaml file not found!!!")
+        print(f"{yaml_file}: yaml file not found or import error!!!")
 
 def add2logfile(logfile, text):
     """
@@ -354,3 +354,68 @@ def g_welmec(lat, h):
     '''
     g_ratio = (9.780318 * (1 + 0.0053024 * np.sin(np.deg2rad(lat))**2 - 0.0000058 * np.sin(2*np.deg2rad(lat))**2) - 0.000003085 * h)
     return g_ratio
+
+def get_global_attributes(ds, config, instrument, flight):
+    '''
+    assigns attributes to the data set according to the config file.
+
+    Parameters:
+    - ds: xarray.Dataset
+        data set which should get attributes
+    - config: dict
+        configuration dictionary
+    - instrument: str
+        instrument as called in the condig file
+    - flight: int
+        flight number
+
+    Returns:
+    - ds: xarray.Dataset
+        data set with attributes.
+    '''
+    try: 
+        attributes = config["instrument_metadata"][instrument]
+        ds.attrs = attributes
+        ds.attrs["title"] = attributes["title"] + f"RF{flight:02} ({str(config["flights"][flight]["date"])})"
+        ds.attrs["campaign"] = config["campaign"]["name"]
+        ds.attrs["platform"] = config["campaign"]["platform"]
+        return ds
+    except:
+        print("No instrument metadata in config file")
+        return ds
+
+def add_segment_coordinate(ds, config, flight):
+    '''
+    assigns segment coordinate to a data set
+
+    Parameters:
+    - ds: xarray.Dataset
+        data set which is supposed to get the segment coordinate
+    - config: dict
+        configuration dictionary
+    - flight: in
+        flight number
+
+    Returns:
+    - ds: xarray.Dataset
+        data set with segment coordinate
+    '''
+    try:
+        seg_fn = config["paths"]["segments"]
+        segments = import_dictionary(seg_fn)
+        flight_segments = segments["flights"][flight]["segments"]
+        
+        times  = [np.datetime64(s["time"]) for s in flight_segments]
+        labels = [s["segment"] for s in flight_segments]
+        
+        # For each timestep, find which segment it belongs to
+        indices = np.searchsorted(times, ds.time.values, side="right") - 1
+        indices = np.clip(indices, 0, len(labels) - 1)
+        segment_list = np.array(labels)[indices]
+        
+        ds = ds.assign_coords(segment=("time", segment_list))
+        ds["segment"].attrs = {"long_name": "segment of the research flight"}
+        return ds
+    except:
+        print("No segment file available")
+        return ds
