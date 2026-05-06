@@ -49,10 +49,11 @@ def run(args):
     vars = h.import_dictionary(config["paths"]["variables"])
     out_vars = h.import_dictionary(config["paths"]["processed_variables"])
     fhp_params = h.import_dictionary(config["paths"]["fiveholeprobe"])
-    outdir = config["paths"]["outdir"]
+    indir = config["paths"]["outdirs"]["raw"]
+    outdir = config["paths"]["outdirs"]["noseboom"]
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
-    fn_in = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
+    fn_in = indir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
     fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_noseboom_100Hz.nc"
     start = config["flights"][flight]["start"]
     stop = config["flights"][flight]["stop"]
@@ -62,9 +63,10 @@ def run(args):
 
     # Calibration of the pressures. For this, the calibration segments are used and the calibration factors are saved in fhp_params. The calibration has to be performed manually. Use the jupyter notebook Get_segments.ipynb.
     pf = "noseboom"
+    twist_angle = np.deg2rad(config["campaign"]["noseboom_twist"])
 
     for v in ["qb", "qc", "ps", "alpha", "beta"]:
-        da = corr.alignement_correction(data, fhp_params, v, pf).rename(v)
+        da = corr.alignement_correction(data, fhp_params, v, pf, twist_angle).rename(v)
         try:
             data_corr[v] = da
         except:
@@ -89,7 +91,7 @@ def run(args):
             data_corr = da.to_dataset()
 
     # Correct relative humidity using the Magnus formula for the saturation pressure.
-    rh_corr = corr.humidity_correction(data.rFHuN, data.ThuN, data_corr.Te_N_corr)
+    rh_corr = corr.humidity_correction(data.rFHuN, data.ThuN, data_corr.ThuN_corr)
     data_corr["rFHuN_corr"] = rh_corr
 
     # Correction of INS with GPS
@@ -129,5 +131,8 @@ def run(args):
                 out_ds = var_data
             out_ds[v].attrs = {}
             out_ds = h.add_attrs_var(out_ds, v, out_vars)
+
+    out_ds = h.get_global_attributes(out_ds, config, pf, flight)
+    out_ds = h.add_segment_coordinate(out_ds, config, flight)
 
     out_ds.to_netcdf(fn_out)
