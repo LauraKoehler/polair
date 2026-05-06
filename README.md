@@ -23,7 +23,9 @@ The tbird command determines the meteorological parameters from the T-Bird simil
 polair tbird -f <flight number> -c <config file>
 ```
 
-# Find corrupted lines in DMS files
+# Useful code
+
+## Find corrupted lines in DMS files
 
 When downloading the data from the DMS system, it happens that there errors in the files such as broken lines, special charachters, missing entries,... When this is the case, the polair package fails in processing these data. Thus, the corrupted lines have to be removed. Here, we provide some code examples which can be used to quickly identify the corrupted line. In most of the cases, this works:
 
@@ -53,3 +55,5 @@ bad_idx gives lines with broken timestamps. Duplicated timestamps could also cau
 dup_times = df.loc[df["time"].duplicated(), "time"]
 ```
 After removing the corrupted lines manually, the polair commands should work.
+
+## Convert yaml to html
