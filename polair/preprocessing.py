@@ -50,7 +50,7 @@ def run(args):
     vars = h.import_dictionary(config["paths"]["variables"])
     cal_file = h.import_dictionary(config["paths"]["calibration"])
     fn_prefix = f"{config["flights"][flight]["data_dir"]}/{config["flights"][flight]["prefix"]}"
-    outdir = config["paths"]["outdir"]
+    outdir = config["paths"]["outdirs"]["raw"]
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
     fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
