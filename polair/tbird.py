@@ -49,10 +49,11 @@ def run(args):
     vars = h.import_dictionary(config["paths"]["variables"])
     out_vars = h.import_dictionary(config["paths"]["processed_variables"])
     fhp_params = h.import_dictionary(config["paths"]["fiveholeprobe"])
-    outdir = config["paths"]["outdir"]
+    indir = config["paths"]["outdirs"]["raw"]
+    outdir = config["paths"]["outdirs"]["tbird"]
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
-    fn_in = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
+    fn_in = indir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
     fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_tbird_100Hz.nc"
     start = config["flights"][flight]["start_tbird"]
     stop = config["flights"][flight]["stop_tbird"]
@@ -63,8 +64,9 @@ def run(args):
     # Calibration of the pressures. For this, the calibration segments are used and the calibration factors are saved in fhp_params. The calibration has to be performed manually. Use the jupyter notebook Get_segments.ipynb.
     pf = "tbird"
 
+    twist_angle = 0
     for v in ["qb", "qc", "ps", "alpha", "beta"]:
-        da = corr.alignement_correction(data, fhp_params, v, pf).rename(v)
+        da = corr.alignement_correction(data, fhp_params, v, pf, twist_angle).rename(v)
         try:
             data_corr[v] = da
         except:
@@ -85,12 +87,16 @@ def run(args):
     # In case of switched antennas (stated in config), reverse angles
     switched_antennas = config["campaign"]["tbird_reversed_antennas"]
 
-    for a in ["thdg_inat", "roll_inat", "pitch_inat"]:
+    for a in ["thdg_inat", "roll_inat", "pitch_inat", "ttrk_inat"]:
         name = f"{a}_corr"
         da = corr.reverse_antennas(data, a, switched_antennas).rename(name)
         data_corr[name] = da
     
     data_corr["tas"] = corr.get_true_air_speed(data_corr, pf)
+
+    # True track is GPS corrected using lat and lon from INAT which come from GPS. This is used as true heading in the wind computation.
+    ttrk_corr = corr.correct_ttrk_inat_with_gps(data, data_corr)
+    data_corr["ttrk_inat_corr"] = ttrk_corr.ttrk_inat_corr
 
     data = data.sel(time = slice(start,stop))
     data_corr = data_corr.sel(time = slice(start,stop))
@@ -115,5 +121,8 @@ def run(args):
             except:
                 out_ds = var_data
             out_ds = h.add_attrs_var(out_ds, v, out_vars)
+
+    out_ds = h.get_global_attributes(out_ds, config, pf, flight)
+    out_ds = h.add_segment_coordinate(out_ds, config, flight)
 
     out_ds.to_netcdf(fn_out)
