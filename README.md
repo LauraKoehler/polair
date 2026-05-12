@@ -23,6 +23,14 @@ The tbird command determines the meteorological parameters from the T-Bird simil
 polair tbird -f <flight number> -c <config file>
 ```
 
+## device
+
+The device command processes data from other instruments than noseboom and t-bird.
+```
+polair device -f <flight number> -c <config file> -i <instruments>  
+```
+Options for instruments are mcpc and partector.
+
 # Useful code
 
 ## Find corrupted lines in DMS files
