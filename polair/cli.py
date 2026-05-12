@@ -3,6 +3,7 @@ import logging
 from .preprocessing import configure_preprocessing_parser
 from .noseboom import configure_noseboom_parser
 from .tbird import configure_tbird_parser
+from .device import configure_device_parser
 from .finalize import configure_finalize_parser
 from ._version import __version__
 
@@ -34,6 +35,7 @@ def get_parser():
     configure_preprocessing_parser(subparsers.add_parser("preprocessing"))
     configure_noseboom_parser(subparsers.add_parser("noseboom"))
     configure_tbird_parser(subparsers.add_parser("tbird"))
+    configure_device_parser(subparsers.add_parser("device"))
     configure_finalize_parser(subparsers.add_parser("finalize"))
 
     return parser

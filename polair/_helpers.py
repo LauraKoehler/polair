@@ -16,6 +16,7 @@ import re
 from pathlib import Path
 from datetime import datetime
 import pint_xarray
+import os
 
 def import_dictionary(yaml_file):
     """
@@ -419,3 +420,45 @@ def add_segment_coordinate(ds, config, flight):
     except:
         print("No segment file available")
         return ds
+
+def import_device_data(indir, pf, time_offset):
+    '''
+    import data from different devices
+
+    Parameters:
+    - indir: str
+        input directory
+    - pf: str
+        platform
+    - time_offset: int
+        offset time in ms between device and noseboom to be defined in config file
+
+    Returns:
+    - ds: xarray.Dataset
+        combined data from files in input directory
+    '''
+    if pf  == "mcpc":
+        files = np.sort([f for f in os.listdir(indir) if f.endswith('.TXT')])
+    elif pf == "partector":
+        files = np.sort([f for f in os.listdir(indir) if f.endswith('.txt')])
+    for fn in files:
+        if pf == "mcpc":
+            df = pd.read_csv(f"{indir}/{fn}", header = 13, sep = "\t")
+            times = pd.to_datetime("20" + df["#YY/MM/DD"]+" "+df["HR:MN:SC"]) - np.timedelta64(time_offset, "ms")
+        elif pf == "partector":
+            df = pd.read_csv(f"{indir}/{fn}", header = 18, sep = "\t")
+            with open(f"{indir}/{fn}") as file:
+                date_str = [next(file) for x in range(9)][-1]
+            clean = date_str.replace('Start: ', '').strip()
+            start_time = np.datetime64(datetime.strptime(clean, '%d.%m.%Y %H:%M:%S'))
+            seconds = df["time"].values.astype("timedelta64[s]")
+            times = start_time + seconds
+        df["time"] = times
+        try:
+            df_all = pd.concat([df_all, df], ignore_index = True)
+        except:
+            df_all = df
+    df_all = df_all.sort_values(by = "time").set_index("time")
+    df_all = df_all[~df_all.index.duplicated(keep='last')]
+    ds = df_all.to_xarray()
+    return ds

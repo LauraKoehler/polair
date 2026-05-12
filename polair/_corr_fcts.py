@@ -510,3 +510,58 @@ def get_wind_component(data, data_corr, component, platform):
         out = wKg - wg
         out = out - out.mean()
     return out
+
+def mask_out_peaks(ds, refvar = "p_air", threshold = 5000, timedelta = 1):
+    '''
+    Mask out peaks in data. Per default, we use the pressure to identify peaks
+
+    Parameters:
+    - ds: xarray.Dataset
+        data
+    - refvar: str
+        Variable used to check for peaks, default is air pressure p_air
+    - threshold: float
+        Threshold used to identify peaks, default is 5000 Pa
+    - timedelta: int
+        timedelta in s in which the peaks are checked, default is 1 s.
+
+    Returns:
+    - ds: xarray.Dataset
+        data with peaks removed
+    '''
+    mask = ds[refvar] - ds[refvar].shift(time = timedelta) < threshold
+    structure = np.ones(11)
+    mask = xr.DataArray(
+        ~binary_dilation(~mask.values, structure=structure),
+        dims=mask.dims,
+        coords=mask.coords
+    )
+    ds = ds.where(mask)
+    return ds
+
+def check_flow(ds, refvar = "flow_rate", variance = 0.1):
+    '''
+    Remove flow anomalies. If the flow rate varies more then 10% (default) from the average flow rate, these values are removed
+
+    Parameters:
+    - ds: xarray.Dataset
+        data
+    - refvar: str
+        Variable used to check the flow rate, default is flow_rate
+    - variance: float
+        Allowed deviation from the mean, default is 0.1 = 10%
+
+    Returns:
+    - ds: xarray.Dataset
+        data with flow anomalies removed
+    '''
+    mean = ds[refvar].mean()
+    mask = np.abs(ds[refvar] - mean) < variance * mean
+    structure = np.ones(11)
+    mask = xr.DataArray(
+        ~binary_dilation(~mask.values, structure=structure),
+        dims=mask.dims,
+        coords=mask.coords
+    )
+    ds = ds.where(mask)
+    return ds
