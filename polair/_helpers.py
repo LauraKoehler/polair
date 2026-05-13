@@ -421,15 +421,15 @@ def add_segment_coordinate(ds, config, flight):
         print("No segment file available")
         return ds
 
-def import_device_data(indir, pf, time_offset):
+def import_device_data(indir, dev, time_offset):
     '''
     import data from different devices
 
     Parameters:
     - indir: str
         input directory
-    - pf: str
-        platform
+    - dev: str
+        device
     - time_offset: int
         offset time in ms between device and noseboom to be defined in config file
 
@@ -437,23 +437,30 @@ def import_device_data(indir, pf, time_offset):
     - ds: xarray.Dataset
         combined data from files in input directory
     '''
-    if pf  == "mcpc":
+    if dev  == "mcpc":
         files = np.sort([f for f in os.listdir(indir) if f.endswith('.TXT')])
-    elif pf == "partector":
+    elif dev == "partector":
         files = np.sort([f for f in os.listdir(indir) if f.endswith('.txt')])
+    elif dev == "partector_dms":
+        files = np.sort([f for f in os.listdir(indir) if f.endswith('.dat')])
     for fn in files:
-        if pf == "mcpc":
+        if dev == "mcpc":
             df = pd.read_csv(f"{indir}/{fn}", header = 13, sep = "\t")
             times = pd.to_datetime("20" + df["#YY/MM/DD"]+" "+df["HR:MN:SC"]) - np.timedelta64(time_offset, "ms")
-        elif pf == "partector":
+            df["time"] = times
+        elif dev == "partector":
             df = pd.read_csv(f"{indir}/{fn}", header = 18, sep = "\t")
             with open(f"{indir}/{fn}") as file:
                 date_str = [next(file) for x in range(9)][-1]
             clean = date_str.replace('Start: ', '').strip()
             start_time = np.datetime64(datetime.strptime(clean, '%d.%m.%Y %H:%M:%S'))
             seconds = df["time"].values.astype("timedelta64[s]")
-            times = start_time + seconds
-        df["time"] = times
+            times = (start_time + seconds).astype("datetime64[ns]") - np.timedelta64(time_offset, "ms")
+            df["time"] = times
+        elif dev == "partector_dms":
+            df = pd.read_csv(f"{indir}/{fn}", sep=";", skiprows=[0, 2, 3], parse_dates=[0])
+            df = df.rename(columns = {'Unnamed: 0': "time"})
+            df["time"] = df["time"] - np.timedelta64(time_offset, "ms")
         try:
             df_all = pd.concat([df_all, df], ignore_index = True)
         except:

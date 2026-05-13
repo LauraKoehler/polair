@@ -27,7 +27,7 @@ polair tbird -f <flight number> -c <config file>
 
 The device command processes data from other instruments than noseboom and t-bird.
 ```
-polair device -f <flight number> -c <config file> -i <instruments>  
+polair device -f <flight number> -c <config file> -i <instrument>  
 ```
 Options for instruments are mcpc and partector.
 

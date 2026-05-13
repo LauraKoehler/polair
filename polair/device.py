@@ -34,9 +34,16 @@ def configure_device_parser(parser):
     parser.add_argument(
         "-i",
         "--instrument",
-        help="instrument to be processed, options are mcpc",
+        help="instrument to be processed, options are mcpc, partector, partector_dms",
         default=None,
         required=True,
+    )
+    parser.add_argument(
+        "-p",
+        "--platform",
+        help='platform where instrument is installed, options are noseboom or tbird',
+        required=False,
+        default="polar6",
     )
     parser.add_argument(
         "-v",
@@ -54,25 +61,39 @@ def run(args):
     config_file = args.config
     config = h.import_dictionary(config_file)
     logfile = h.create_logfile(config)
-    pf = args.instrument
+    dev = args.instrument
+    pf = args.platform
+    if pf == "polar6":
+        dev_pf = dev
+    elif pf == "tbird":
+        dev_pf = f"{dev}_{pf}"
+    dev_name = dev
+    if dev[-4:] == "_dms":
+        dev_name = dev[:-4]
+    if pf == "tbird":
+        dev_name = f"{dev_name}_{pf}"
     out_vars = h.import_dictionary(config["paths"]["processed_variables"])
-    out_vars = out_vars[pf]
-    indir = config["flights"][flight][pf]
-    outdir = config["paths"]["outdirs"][pf]
+    out_vars = out_vars[dev]
+    indir = config["flights"][flight][dev_name]
+    outdir = config["paths"]["outdirs"][dev_name]
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
-    fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_{pf}.nc"
-    start = np.datetime64(config["flights"][flight]["start"])
-    stop = np.datetime64(config["flights"][flight]["stop"])
-    h.add2logfile(logfile, f"{pf}: {config["campaign"]["name"]}, flight {flight}, {flight_date}")
+    fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_{dev_name}.nc"
+    if pf == "polar6":
+        start = np.datetime64(config["flights"][flight]["start"])
+        stop = np.datetime64(config["flights"][flight]["stop"])
+    elif pf == "tbird":
+        start = np.datetime64(config["flights"][flight]["start_tbird"])
+        stop = np.datetime64(config["flights"][flight]["stop_tbird"])
+    h.add2logfile(logfile, f"{dev_name}: {config["campaign"]["name"]}, flight {flight}, {flight_date}")
 
     try:
-        time_offset = config["flights"][flight]["time_offsets"][pf]
+        time_offset = config["flights"][flight]["time_offsets"][dev_name]
     except:
         print("No time offset for this instrument mentioned in config.")
         time_offset = 0
 
-    ds = h.import_device_data(indir, pf, time_offset)
+    ds = h.import_device_data(indir, dev, time_offset)
 
     var_list = list(out_vars.keys())
     
@@ -90,22 +111,27 @@ def run(args):
         out_ds = h.add_attrs_var(out_ds, v, out_vars)
 
     try:
-        indir_nb = config["paths"]["outdirs"]["noseboom"]
-        fn_nb = indir_nb+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_noseboom_100Hz.nc"
-        data_nb = xr.open_dataset(fn_nb)
-        data_nb_int = data_nb.interp({"time":out_ds.time.values}, method = "nearest")
-        out_ds = out_ds.assign_coords({"lat": data_nb_int.lat, "lon": data_nb_int.lon, "alt": data_nb_int.alt})
+        if pf == "polar6":
+            indir_pf = config["paths"]["outdirs"]["noseboom"]
+            fn_pf = indir_pf+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_noseboom_100Hz.nc"
+        elif pf == "tbird":
+            indir_pf = config["paths"]["outdirs"]["tbird"]
+            fn_pf = indir_pf+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_tbird_100Hz.nc"
+        data_pf = xr.open_dataset(fn_pf)
+        data_pf_int = data_pf.interp({"time":out_ds.time.values}, method = "nearest")
+        out_ds = out_ds.assign_coords({"lat": data_pf_int.lat, "lon": data_pf_int.lon, "alt": data_pf_int.alt})
 
     except:
-        print("No processed noseboom file with position data found for this flight")
+        print("No processed turbulence file with position data found for this flight")
 
-    # Cut first and last 2 minutes since there are often very high counts due to the own emissions
-    if pf in ["mcpc"]:
+    if dev in ["mcpc", "partector"]:
+        # Cut first and last 2 minutes since there are often very high counts due to the own emissions
         out_ds = out_ds.sel(time = slice(start + np.timedelta64(2,"m"), stop - np.timedelta64(2,"m")))
+    if dev in ["mcpc", "partector", "partector_dms"]:
         out_ds = corr.mask_out_peaks(out_ds)
         out_ds = corr.check_flow(out_ds)
 
-    out_ds = h.get_global_attributes(out_ds, config, pf, flight)
+    out_ds = h.get_global_attributes(out_ds, config, dev_name, flight)
     out_ds = h.add_segment_coordinate(out_ds, config, flight)
 
     out_ds.to_netcdf(fn_out)
