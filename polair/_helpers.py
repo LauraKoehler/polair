@@ -443,6 +443,9 @@ def import_device_data(indir, dev, time_offset):
         files = np.sort([f for f in os.listdir(indir) if f.endswith('.txt')])
     elif dev == "partector_dms":
         files = np.sort([f for f in os.listdir(indir) if f.endswith('.dat')])
+    elif dev == "kt19":
+        files = np.sort([f for f in os.listdir(indir) if f.endswith('KT19serial.ERR.dat')])
+        
     for fn in files:
         if dev == "mcpc":
             df = pd.read_csv(f"{indir}/{fn}", header = 13, sep = "\t")
@@ -461,6 +464,10 @@ def import_device_data(indir, dev, time_offset):
             df = pd.read_csv(f"{indir}/{fn}", sep=";", skiprows=[0, 2, 3], parse_dates=[0])
             df = df.rename(columns = {'Unnamed: 0': "time"})
             df["time"] = df["time"] - np.timedelta64(time_offset, "ms")
+        elif dev == "kt19":
+            df = pd.read_csv(f"{indir}/{fn}", header  = 4, sep = r'\s+', names = ["date", "times", "KT19 Serial", "unit"])
+            times = pd.to_datetime(df["date"].values+"T"+df["times"].values)
+            df["time"] = times - np.timedelta64(time_offset, "ms")
         try:
             df_all = pd.concat([df_all, df], ignore_index = True)
         except:
@@ -468,4 +475,45 @@ def import_device_data(indir, dev, time_offset):
     df_all = df_all.sort_values(by = "time").set_index("time")
     df_all = df_all[~df_all.index.duplicated(keep='last')]
     ds = df_all.to_xarray()
+    return ds
+
+def resample2sec(ds, resample, freq = "1s"):
+    '''
+    resample data to 1s (default) temporal resolution. e.g. if timestamps from DMS. Used method is 'nearest'. This function is optional and not used per default
+
+    Parameters:
+    - ds: xarray.Dataset
+        data to be resampled
+    - resample: bool
+        resampling is only done if resample is put to True
+    - freq: str
+        resampling frequency. Default is "1s" which corresponds to 1 second
+
+    Returns:
+    - ds: xarray.Dataset
+        resampled dataset if sampling is put to True. Else ds is not changed
+
+    '''
+    if resample:
+        ds = ds.resample(time = freq).nearest()
+    return ds
+
+def import_radiation_data(fn, name):
+    '''
+    imports the radiation file from the DMS raw data
+
+    Parameters:
+    - fn: str
+        filename
+    - name: str
+        variable name
+
+    Returns:
+    - ds: xarray.Dataset
+        data set with variable data
+    '''
+    data = pd.read_csv(fn, header  = 4, sep = r'\s+', names = ["date", "times", name])
+    times = pd.to_datetime(data["date"].values+"T"+data["times"].values)
+    data["time"] = times
+    ds = data.set_index("time").to_xarray()
     return ds

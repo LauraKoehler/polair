@@ -106,7 +106,7 @@ def reverse_antennas(ds, angle, shift):
     if angle in ["roll_inat", "pitch_inat"]:
         da = sign * ds[angle]
     else:
-        da = (ds[angle] + delta)
+        da = (ds[angle] + delta) % 360
     return da
 
 def get_w_ins(data, start, stop, deltat = 0.01):
@@ -253,18 +253,22 @@ def alignement_correction(data, fhp_params, v, platform, twist_angle):
     a1_ps = fhp_params[platform][v]["a1_ps"]
     a1_qratio = fhp_params[platform][v]["a1_qratio"]
     if platform == "noseboom":
-        if v in ["qb", "qc", "ps"]:
+        if v in ["qc", "ps"]:
             out = a0 + a1_qb * data.qbN + a1_qc * data.qcN + a1_ps * data.psN
+        elif v in ["qb"]:
+            out = np.cos(twist_angle) * data.qbN - np.sin(twist_angle) * data.qaN
+            
         elif v in ["alpha"]:
             out = a0 + a1_qratio * (np.cos(twist_angle) * data.qaN + np.sin(twist_angle) * data.qbN)/data.qcN
         elif v in ["beta"]:
-            out = a0 + a1_qratio * (np.cos(twist_angle) * data.qbN - np.sin(twist_angle) * data.qaN)/data.qcN
-#            b0 = fhp_params[platform]["qb"]["a0"]
-#            b1_qb = fhp_params[platform]["qb"]["a1_qb"]
-#            b1_qc = fhp_params[platform]["qb"]["a1_qc"]
-#            b1_ps = fhp_params[platform]["qb"]["a1_ps"]
-#            qb = b0 + b1_qb * data.qbN + b1_qc * data.qcN + b1_ps * data.psN
+#            out = a0 + a1_qratio * (np.cos(twist_angle) * data.qbN - np.sin(twist_angle) * data.qaN)/data.qcN
+            b0 = fhp_params[platform]["qb"]["a0"]
+            b1_qb = fhp_params[platform]["qb"]["a1_qb"]
+            b1_qc = fhp_params[platform]["qb"]["a1_qc"]
+            b1_ps = fhp_params[platform]["qb"]["a1_ps"]
+            qb = b0 + b1_qb * data.qbN + b1_qc * data.qcN + b1_ps * data.psN
 #            out = a0 + a1_qratio * (np.cos(twist_angle) * qb - np.sin(twist_angle) * data.qaN)/data.qcN
+            out = a0 + a1_qratio * qb/data.qcN
     elif platform == "tbird":
         if v in ["qb", "qc", "ps"]:
             out = a0 + a1_qb * data.qbT + a1_qc * data.qcT + a1_ps * data.psT
@@ -334,6 +338,32 @@ def true_track_xarray(lat1, lon1, lat2, lon2):
     bearing = (bearing + 360) % 360
     return bearing
 
+def unwrap_with_nans(da, period=360):
+    '''
+    interpolate over nans to use the unwrapping needed for taking the difference between angles. nans are recovered at the end
+
+    Parameters:
+    - da: xarray.DataArray
+        angle data to be unwrapped
+    - period: float
+        period used for unwrapping, default is 360 (degrees)
+
+    Returns:
+    - out: xarray.DataArray
+        unwrapped data array with nans at original positions
+    '''
+    values = da.values.copy()
+    nans = ~np.isfinite(values)
+    # Interpolate over NaNs
+    x = np.arange(len(values))
+    values[nans] = np.interp(x[nans], x[~nans], values[~nans])
+    # Unwrap
+    unwrapped = np.unwrap(values, period=period)
+    # Restore NaNs
+    unwrapped[nans] = np.nan
+    out = xr.DataArray(unwrapped, coords=da.coords, dims=da.dims)
+    return out
+
 def correct_ttrk_inat_with_gps(data, data_corr):
     '''
     INS stabilization with GPS
@@ -348,18 +378,38 @@ def correct_ttrk_inat_with_gps(data, data_corr):
     - corrected: xarray.Dataset
         GPS corrected INAT ttrk
     '''
-    v= "ttrk_inat_corr"
+#    v= "ttrk_inat_corr"
+#    lat = data.lat_inat
+#    lon = data.lon_inat
+#    gps_v = true_track_xarray(lat, lon, lat.shift(time=-1), lon.shift(time=-1))
+
+#    rolling_inat = data_corr[v].rolling(time = 1000, center = True).mean()
+#    rolling_gps = gps_v.rolling(time = 1000, center = True).mean()
+    
+#    difference = rolling_inat - rolling_gps
+    
+#    corrected = (data_corr[v] - difference) % 360
+#    corrected = corrected.to_dataset(name = f"{v}")
+    v = "ttrk_inat_corr"
     lat = data.lat_inat
     lon = data.lon_inat
     gps_v = true_track_xarray(lat, lon, lat.shift(time=-1), lon.shift(time=-1))
+    ttrk_fixed = data_corr.ttrk_inat_corr
 
-    rolling_inat = data_corr[v].rolling(time = 1000, center = True).mean()
-    rolling_gps = gps_v.rolling(time = 1000, center = True).mean()
-    
-    difference = rolling_inat - rolling_gps
-    
-    corrected = data_corr[v] - difference
-    corrected = corrected.to_dataset(name = f"{v}")
+    # 2. Now unwrap safely and apply rolling mean
+    inat_unwrap = unwrap_with_nans(ttrk_fixed)
+    gps_unwrap  = unwrap_with_nans(gps_v)
+
+    inat_da = xr.DataArray(inat_unwrap, coords=data_corr[v].coords, dims=data_corr[v].dims)
+    gps_da  = xr.DataArray(gps_unwrap,  coords=gps_v.coords, dims=gps_v.dims)
+
+    rolling_inat = inat_da.rolling(time=1000, center=True).mean()
+    rolling_gps  = gps_da.rolling(time=1000, center=True).mean()
+
+    difference = (rolling_inat - rolling_gps + 180) % 360 - 180
+
+    corrected = (ttrk_fixed - difference) % 360
+    corrected = corrected.to_dataset(name=v)
     return corrected
 
 def angle_diff(a, b):
@@ -458,7 +508,6 @@ def get_wind_component(data, data_corr, component, platform):
         beta = np.deg2rad(data_corr["beta"])
         ttrk = np.deg2rad(data_corr["ttrk_inat_corr"])
         thdg = np.deg2rad(data_corr["thdg_inat_corr"])
-        ttrk, thdg = mask_ttrk_thdg(ttrk, thdg)
         psi_rate = -(thdg - thdg.shift(time = 1))/0.01
 
         c1 = 0.0
@@ -469,7 +518,7 @@ def get_wind_component(data, data_corr, component, platform):
         vrzf = c2 * phi_rate - c3 * theta_rate
         vns = data["gs_inat"] * np.cos(ttrk)
         vew = data["gs_inat"] * np.sin(ttrk)
-        vup = data["h_inat"].diff("time")/0.01
+        vup = data["h_inat"].rolling(time=100, center=True).mean().diff("time")/0.01
 
     uKg = (vew
            + vrxf * np.cos(theta) * np.sin(thdg)
@@ -565,3 +614,110 @@ def check_flow(ds, refvar = "flow_rate", variance = 0.1):
     )
     ds = ds.where(mask)
     return ds
+
+def ampbox2swr_pyranometer(I):
+    """
+    The ampbox manual says "As standard the amplifier is delivered such that an input signal or 1 mV produces an output of 1 mA, so that 4-20 mA represents 0-16 mV." We use this to convert the pyranometer and pyrgeometer data.
+    
+    Parameters:
+    - I: xarray.DataArray
+        raw current in A
+
+    Returns:
+    - G: xarray.DataArray
+        radiation in W/m2
+    """
+    # DMS: "4-20mA correspond to -50 W/m² to + 1950 W/m²"
+    I_min, I_max = 4e-3, 20e-3    # A
+    R_min, R_max = -50, 1950    # W/m2
+
+    # Step 1: Linear interpolation current → voltage (V)
+    R = (I - I_min) / (I_max - I_min) * (R_max - R_min) + R_min
+
+    return R
+
+def ampbox2lwr_pyrgeometer(I, T):
+    """
+    The ampbox manual says "As standard the amplifier is delivered such that an input signal or 1 mV produces an output of 1 mA, so that 4-20 mA represents 0-16 mV." We use this to convert the pyranometer and pyrgeometer data.
+    
+    Parameters:
+    - I: xarray.DataArray
+        raw current in mA
+    - T: xarray.DataArray
+        body temperature in K
+        
+    Returns:
+    - G: xarray.DataArray
+        long wave radiation in W/m2
+    """
+    sigma = 5.670374 * 10**(-8)
+    
+    # DMS: "4-20mA correspond to - 400 W/m² to + 400 W/m²"
+    I_min, I_max = 4e-3, 20e-3    # A
+    R_min, R_max = -400, 400    # W/m2
+
+    # Step 1: Linear interpolation current → power  flux (W/m2)
+    R = (I - I_min) / (I_max - I_min) * (R_max - R_min) + R_min
+
+    # Step 2: Correct for temperature
+    G = R + sigma * T**4
+    
+    return G
+
+def resistance2temperature(R):
+    """
+    conversion of PT-100 resistance in Ohm in radiation sensors to K
+    Callendar-Van-Dusen equation (https://de.wikipedia.org/wiki/Callendar-Van-Dusen-Gleichung), a, b from Datasheet
+
+    Parameters:
+    - R: xarray.DataArray
+        resistance in Ohm
+    
+    Returns:
+    - t: xarray.DataArray
+        temperature in K
+    """
+    a = 3.9080 * 10**(-3)
+    b = -5.8019 * 10**(-7)
+
+    t = (-a + np.sqrt(a**2 - 4 * b * (-R/100 + 1)))/(2 * b) + 273.15
+
+    return t
+
+def get_radiation(config, flight, out_vars):
+    '''
+    calculates body temperatures and radiation from DMS raw data
+
+    Parameters:
+    - config: dict
+        config dictionary
+    - flight: int
+        flight number
+    - out_vars: dict
+        dictionary with output variables
+    
+    Returns:
+    - out: xarray.Dataset
+        dataset with lw and sw from top and bottom
+    '''
+    fn_prefix = f"{config["flights"][flight]["data_dir"]}/{config["flights"][flight]["prefix"]}"
+    vars = list(reversed(np.sort(list(out_vars.keys()))))
+
+    for v in vars:
+        old_name = out_vars[v]["old"]
+        fn = fn_prefix + old_name + ".dat"
+        ds = h.import_radiation_data(fn, old_name)
+        if v[0] == "t":
+            data = resistance2temperature(ds[old_name]).to_dataset(name = old_name)
+        else:
+            if old_name[:6] == "Pyrano":
+                data = ampbox2swr_pyranometer(ds[old_name]).to_dataset(name = old_name)
+            if old_name[:6] == "Pyrgeo":
+                t_name = old_name[:-7] + "T_raw"
+                data = ampbox2lwr_pyrgeometer(ds[old_name], out[t_name]).to_dataset(name = old_name)
+        try:
+            out = xr.merge([out, data])
+        except:
+            out = data
+
+    return out

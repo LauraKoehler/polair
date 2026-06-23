@@ -34,7 +34,7 @@ def configure_device_parser(parser):
     parser.add_argument(
         "-i",
         "--instrument",
-        help="instrument to be processed, options are mcpc, partector, partector_dms",
+        help="instrument to be processed, options are mcpc, partector, partector_dms, kt19, radiation",
         default=None,
         required=True,
     )
@@ -74,7 +74,10 @@ def run(args):
         dev_name = f"{dev_name}_{pf}"
     out_vars = h.import_dictionary(config["paths"]["processed_variables"])
     out_vars = out_vars[dev]
-    indir = config["flights"][flight][dev_name]
+    if dev in ["kt19", "radiation"]:
+        indir = config["flights"][flight]["data_dir"]
+    else:
+        indir = config["flights"][flight][dev_name]
     outdir = config["paths"]["outdirs"][dev_name]
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
@@ -93,7 +96,13 @@ def run(args):
         print("No time offset for this instrument mentioned in config.")
         time_offset = 0
 
-    ds = h.import_device_data(indir, dev, time_offset)
+    if dev == "radiation":
+        ds = corr.get_radiation(config, flight, out_vars)
+    else:
+        ds = h.import_device_data(indir, dev, time_offset)
+
+    # Resampling to 1 sec time resolution is only done if resample = True. Otherwise, the original time stamps are kept.
+    ds = h.resample2sec(ds, resample = False)
 
     var_list = list(out_vars.keys())
     
@@ -120,6 +129,8 @@ def run(args):
         data_pf = xr.open_dataset(fn_pf)
         data_pf_int = data_pf.interp({"time":out_ds.time.values}, method = "nearest")
         out_ds = out_ds.assign_coords({"lat": data_pf_int.lat, "lon": data_pf_int.lon, "alt": data_pf_int.alt})
+        if dev in ["radiation"]:
+            out_ds = out_ds.assign({"pitch": data_pf_int.pitch, "roll": data_pf_int["roll"]})
 
     except:
         print("No processed turbulence file with position data found for this flight")
@@ -133,5 +144,5 @@ def run(args):
 
     out_ds = h.get_global_attributes(out_ds, config, dev_name, flight)
     out_ds = h.add_segment_coordinate(out_ds, config, flight)
-
+    
     out_ds.to_netcdf(fn_out)
