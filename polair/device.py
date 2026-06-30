@@ -41,7 +41,7 @@ def configure_device_parser(parser):
     parser.add_argument(
         "-p",
         "--platform",
-        help='platform where instrument is installed, options are noseboom or tbird',
+        help='platform where instrument is installed, options are polar6 or tbird',
         required=False,
         default="polar6",
     )
@@ -100,7 +100,6 @@ def run(args):
         ds = corr.get_radiation(config, flight, out_vars)
     else:
         ds = h.import_device_data(indir, dev, time_offset)
-
     # Resampling to 1 sec time resolution is only done if resample = True. Otherwise, the original time stamps are kept.
     ds = h.resample2sec(ds, resample = False)
 
@@ -135,6 +134,11 @@ def run(args):
     except:
         print("No processed turbulence file with position data found for this flight")
 
+    # Reduction to standard temperature and pressure for devices specified in config file
+    devs4stp = config["campaign"]["stp"]
+    if dev in devs4stp:
+        out_ds = corr.stp_conditions(out_ds)
+    
     if dev in ["mcpc", "partector"]:
         # Cut first and last 2 minutes since there are often very high counts due to the own emissions
         out_ds = out_ds.sel(time = slice(start + np.timedelta64(2,"m"), stop - np.timedelta64(2,"m")))

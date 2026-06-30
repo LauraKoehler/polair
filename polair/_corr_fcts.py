@@ -560,7 +560,7 @@ def get_wind_component(data, data_corr, component, platform):
         out = out - out.mean()
     return out
 
-def mask_out_peaks(ds, refvar = "p_air", threshold = 5000, timedelta = 1):
+def mask_out_peaks(ds, refvar = "p_amb", threshold = 5000, timedelta = 1):
     '''
     Mask out peaks in data. Per default, we use the pressure to identify peaks
 
@@ -721,3 +721,30 @@ def get_radiation(config, flight, out_vars):
             out = data
 
     return out
+
+def stp_conditions(ds, temp = "t_amb", pres = "p_amb"):
+    '''
+    adds an additional variable to the dataset reduced to standard temperature and pressure (stp) with p0 = 1013 hPa and T0 = 0˚C for variables in stp_vars
+    the dataset needs to have the device internal temperature and pressure
+
+    Parameters:
+    - ds: xarray.Dataset
+        dataset which with variable to reduce to stp, ambient temperature and pressure
+    - temp: str
+        name of temperature variable, default is t_amb
+    - pres: str
+        name of pressure variable, default is p_amb
+
+    Returns:
+    - ds: xarray.Dataset
+        dataset with addiational variables reduced to standard temperature and pressure
+    '''
+    stp_vars = {"number_conc": {'units': '1/m^3', 'long_name': 'stp number concentration', 'comment': 'stp conditions: 273.15 K, 1013 hPa'}}
+
+    for v in ds.keys():
+        if v in list(stp_vars.keys()):
+            stp_corr = ds[v] * 101300/273.15 * ds[temp]/ds[pres]
+            ds[f"{v}_stp"] = stp_corr
+            if v == "number_conc":
+                ds[f"{v}_stp"].attrs = stp_vars[v]
+    return ds
