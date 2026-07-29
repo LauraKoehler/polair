@@ -20,6 +20,7 @@ The device command processes data from other instruments than noseboom and t-bir
 Options for instruments are mcpc, partector, partector_dms, kt19, and radiation.
 Platform `p` is optional with default being `polar6`, add if platform is `tbird`.
 
+
 """
 
 from . import _helpers as h
