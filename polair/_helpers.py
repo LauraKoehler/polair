@@ -1,5 +1,5 @@
 """
-titile: _helpers.py
+title: _helpers.py
 author: Laura Köhler
 institution: Alfred-Wegener-Institut, Bremerhaven, Germany
 contact: laura.koehler@awi.de
