@@ -1,11 +1,15 @@
 """
-titile: device.py
-author: Laura Köhler
-institution: Alfred-Wegener-Institut, Bremerhaven, Germany
-contact: laura.koehler@awi.de
-date: 2026-05-08
-content: processing command for different devices
-comment: part of polair package
+Processing command for different devices
+
+This module is part of the polair package and provides functionality for
+processing different devices.
+
+| title: device.py
+| author: Laura Köhler
+| institution: Alfred-Wegener-Institut, Bremerhaven, Germany
+| contact: laura.koehler@awi.de
+| date: 2026-05-08
+
 """
 
 from . import _helpers as h

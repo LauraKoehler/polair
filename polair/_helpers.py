@@ -1,11 +1,13 @@
 """
-title: _helpers.py
-author: Laura Köhler
-institution: Alfred-Wegener-Institut, Bremerhaven, Germany
-contact: laura.koehler@awi.de
-date: 2026-04-17
-content: defintions for DMS data processing
-comment: part of polair package
+Functions for DMS data processing
+
+Part of th epolair package.
+
+| title: _helpers.py
+| author: Laura Köhler
+| institution: Alfred-Wegener-Institut, Bremerhaven, Germany
+| contact: laura.koehler@awi.de
+| date: 2026-04-17
 """
 
 import numpy as np
