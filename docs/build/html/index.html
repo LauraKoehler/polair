@@ -1,0 +1,197 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>polair documentation &mdash; polair v1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=76e2d817"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Documentation" href="api_documentation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            polair
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_documentation.html">API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">polair</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">polair documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="polair-documentation">
+<h1>polair documentation<a class="headerlink" href="#polair-documentation" title="Link to this heading"></a></h1>
+<section id="polair">
+<h2>polair<a class="headerlink" href="#polair" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://doi.org/10.5281/zenodo.21065056"><img alt="DOI" src="https://zenodo.org/badge/DOI/10.5281/zenodo.21065056.svg" /></a></p>
+<p>This package provides a command line tool for processing atmospheric data from the polar research aircrafts Polar 5 and 6. It can be used to process data downloaded from the <a class="reference external" href="https://dms.awi.de/exportdisplay/">DMS</a> system, convert the values to physical quantities, calibrate, and homogenise the time stamp. Furthermore, it can be used to process the noseboom and the t-bird to obtain corrected physical variables including the wind components. As a final step, it can be used to create standardised netCDF data sets with metadata and flight information. For this, we recommend to document all information needed to process a specific campaign in a dedicated repository. To use the polair package, you need to provide a configuration file with information of the campaign and several yaml dictionaries with information on calibration, variables of interest, units, flight segments, and so on. The BACSAM II campaign repository can serve as a blueprint.</p>
+<section id="setup">
+<h3>Setup<a class="headerlink" href="#setup" title="Link to this heading"></a></h3>
+<p>Install polair:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">polair</span>
+</pre></div>
+</div>
+</section>
+<section id="preprocessing">
+<h3>preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading"></a></h3>
+<p>The preprocessing command converts all data in physical quantities. If necessary and provided, it calibrates the data. Finally, they are interpolated on common (default 100 Hz) time stamps. The command also checks for data gaps and sampling errors which are noted in the log file. The calibrated raw data will be saved as a netCDF file. The location needs to be specified in the configuration file of the campaign</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">polair</span> <span class="n">preprocessing</span> <span class="o">-</span><span class="n">f</span> <span class="o">&lt;</span><span class="n">flight</span> <span class="n">number</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">c</span> <span class="o">&lt;</span><span class="n">config</span> <span class="n">file</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="noseboom">
+<h3>noseboom<a class="headerlink" href="#noseboom" title="Link to this heading"></a></h3>
+<p>The noseboom command determines the basic meteorological parameters from the calibrated raw data of the noseboom which can be mounted at the nose of Polar 5 and 6. Adiabatic corrections are used and the wind components are determined.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">polair</span> <span class="n">noseboom</span> <span class="o">-</span><span class="n">f</span> <span class="o">&lt;</span><span class="n">flight</span> <span class="n">number</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">c</span> <span class="o">&lt;</span><span class="n">config</span> <span class="n">file</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="tbird">
+<h3>tbird<a class="headerlink" href="#tbird" title="Link to this heading"></a></h3>
+<p>The tbird command determines the meteorological parameters from the T-Bird similar to the noseboom command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">polair</span> <span class="n">tbird</span> <span class="o">-</span><span class="n">f</span> <span class="o">&lt;</span><span class="n">flight</span> <span class="n">number</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">c</span> <span class="o">&lt;</span><span class="n">config</span> <span class="n">file</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="device">
+<h3>device<a class="headerlink" href="#device" title="Link to this heading"></a></h3>
+<p>The device command processes data from other instruments than noseboom and t-bird.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">polair</span> <span class="n">device</span> <span class="o">-</span><span class="n">f</span> <span class="o">&lt;</span><span class="n">flight</span> <span class="n">number</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">c</span> <span class="o">&lt;</span><span class="n">config</span> <span class="n">file</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">i</span> <span class="o">&lt;</span><span class="n">instrument</span><span class="o">&gt;</span>  <span class="o">-</span><span class="n">p</span> <span class="o">&lt;</span><span class="n">platform</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Options for instruments are mcpc, partector, partector_dms, kt19, and radiation. Platform p is optional with polar6, add if platform is tbird.</p>
+</section>
+</section>
+<section id="useful-code">
+<h2>Useful code<a class="headerlink" href="#useful-code" title="Link to this heading"></a></h2>
+<section id="find-corrupted-lines-in-dms-files">
+<h3>Find corrupted lines in DMS files<a class="headerlink" href="#find-corrupted-lines-in-dms-files" title="Link to this heading"></a></h3>
+<p>When downloading the data from the DMS system, it happens that there errors in the files such as broken lines, special charachters, missing entries,… When this is the case, the polair package fails in processing these data. Thus, the corrupted lines have to be removed. Here, we provide some code examples which can be used to quickly identify the corrupted line. In most of the cases, this works:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">corrupted_file</span><span class="o">&gt;</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unicode error in line </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="mi">200</span><span class="p">])</span>  <span class="c1"># show beginning of bad line</span>
+            <span class="k">break</span>
+</pre></div>
+</div>
+<p>This gives the corrupted line number. However, empty lines are not counted. So, if every second line is empty, you need to double the result. If this is not working, try</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">corrupted_file</span><span class="o">&gt;</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">header</span>  <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;var&quot;</span><span class="p">])</span>
+<span class="n">bad_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">15</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>bad_idx gives lines with broken timestamps. Duplicated timestamps could also cause problems:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dup_times</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(),</span> <span class="s2">&quot;time&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>After removing the corrupted lines manually, the polair commands should work.</p>
+</section>
+<section id="convert-yaml-to-html">
+<h3>Convert yaml to html<a class="headerlink" href="#convert-yaml-to-html" title="Link to this heading"></a></h3>
+</section>
+</section>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_documentation.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_documentation.html#module-polair.noseboom">noseboom</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_documentation.html#module-polair._helpers">helpers</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_documentation.html" class="btn btn-neutral float-right" title="API Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Laura Köhler.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
