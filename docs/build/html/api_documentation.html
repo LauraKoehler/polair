@@ -156,7 +156,7 @@ processing the T-Bitd data.</p>
 <section id="module-polair._helpers">
 <span id="helpers"></span><h2>helpers<a class="headerlink" href="#module-polair._helpers" title="Link to this heading"></a></h2>
 <p>Functions for DMS data processing</p>
-<p>Part of th epolair package.</p>
+<p>Part of the polair package.</p>
 <div class="line-block">
 <div class="line">title: _helpers.py</div>
 <div class="line">author: Laura Köhler</div>
@@ -167,458 +167,405 @@ processing the T-Bitd data.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.add2logfile">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">add2logfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.add2logfile" title="Link to this definition"></a></dt>
-<dd><p>Writes text in the logfile</p>
-<p>Parameters:
-- logfile: .txt file</p>
-<blockquote>
-<div><p>Logfile for the processing, location defined in the config file</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>text: str</dt><dd><p>Text which should be added to the logfile</p>
+<dd><p>Writes text in the logfile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logfile</strong> – .txt file
+Logfile for the processing, location defined in the config file</p></li>
+<li><p><strong>text</strong> – str
+Text which should be added to the logfile</p></li>
+</ul>
 </dd>
 </dl>
-</li>
-</ul>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.add_attrs_var">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">add_attrs_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.add_attrs_var" title="Link to this definition"></a></dt>
-<dd><p>This function adds all attributes from the variable dictrionary except for the old name which is only necessary to read in the correct file. It adds the original unit because no unit conversion is done so far.</p>
-<p>Parameters:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>Input dataset</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>v: str</dt><dd><p>Variable for which attributes are added</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>var_dict: dict</dt><dd><p>Dictionary with all the information for each parameter</p>
-</dd>
-</dl>
-</li>
+<dd><p>This function adds all attributes from the variable dictrionary except for the old name which is only necessary to read in the correct file.</p>
+<p>It adds the original unit because no unit conversion is done so far.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+Input dataset</p></li>
+<li><p><strong>v</strong> – str
+Variable for which attributes are added</p></li>
+<li><p><strong>var_dict</strong> – dict
+Dictionary with all the information for each parameter</p></li>
 </ul>
-<p>Returns:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>Dataset with added attributes.</p>
-</div></blockquote>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataset with added attributes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.add_global_attrs">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">add_global_attrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.add_global_attrs" title="Link to this definition"></a></dt>
-<dd><p>This function adds metadata to the data set as stated in the config file</p>
-<p>Parameters:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>Input data set</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>config: dict</dt><dd><p>config file containing campaign information</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>flight: int</dt><dd><p>research flight which is processed</p>
-</dd>
-</dl>
-</li>
+<dd><p>This function adds metadata to the data set as stated in the config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+Input data set</p></li>
+<li><p><strong>config</strong> – dict
+config file containing campaign information</p></li>
+<li><p><strong>flight</strong> – int
+research flight which is processed</p></li>
 </ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.add_segment_coordinate">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">add_segment_coordinate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.add_segment_coordinate" title="Link to this definition"></a></dt>
-<dd><p>assigns segment coordinate to a data set</p>
-<p>Parameters:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>data set which is supposed to get the segment coordinate</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>config: dict</dt><dd><p>configuration dictionary</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>flight: in</dt><dd><p>flight number</p>
-</dd>
-</dl>
-</li>
+<dd><p>Assigns segment coordinate to a data set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+data set which is supposed to get the segment coordinate</p></li>
+<li><p><strong>config</strong> – dict
+configuration dictionary</p></li>
+<li><p><strong>flight</strong> – int
+flight number</p></li>
 </ul>
-<p>Returns:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>data set with segment coordinate</p>
-</div></blockquote>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>data set with segment coordinate</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.check_sampling">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">check_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.check_sampling" title="Link to this definition"></a></dt>
-<dd><p>Check if sampling interval in df[‘time’] matches expected_sampling (seconds).
-95% of samples should match within tolerance. Identified gaps and sampling issues are written in the logfile.</p>
-<p>Parameters:
-- df: pandas.DataFrame</p>
-<blockquote>
-<div><p>Dataframe with data</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>v: str</dt><dd><p>Variable name</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>var_dict: dict</dt><dd><p>Dictionary with varible information</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>logfile: str</dt><dd><p>Logfile path</p>
-</dd>
-</dl>
-</li>
+<dd><p>Check if sampling interval in df[‘time’] matches expected_sampling (seconds).</p>
+<p>95% of samples should match within tolerance. Identified gaps and sampling issues are written in the logfile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – pandas.DataFrame
+Dataframe with data</p></li>
+<li><p><strong>v</strong> – str
+Variable name</p></li>
+<li><p><strong>var_dict</strong> – dict
+Dictionary with varible information</p></li>
+<li><p><strong>logfile</strong> – str
+Logfile path</p></li>
 </ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.convert_unit">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">convert_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.convert_unit" title="Link to this definition"></a></dt>
-<dd><p>This function converts the unit from the original unit to the final (SI) unit specified in the variable information</p>
-<p>Parameters:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>Input dataset</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>var_dict: dict</dt><dd><p>Dictionary with variable (unit) information</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>v: str</dt><dd><p>Variable for which unit should be converted</p>
-</dd>
-</dl>
-</li>
+<dd><p>This function converts the unit from the original unit to the final (SI) unit specified in the variable information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+Input dataset</p></li>
+<li><p><strong>var_dict</strong> – dict
+Dictionary with variable (unit) information</p></li>
+<li><p><strong>v</strong> – str
+Variable for which unit should be converted</p></li>
 </ul>
-<p>Returns:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>Dataset with converted units</p>
-</div></blockquote>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataset with converted units</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.create_logfile">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">create_logfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.create_logfile" title="Link to this definition"></a></dt>
-<dd><p>Check if processing log file already exists, if not, create it, print date and time
-The config file needs to contain the path information of the log file.</p>
-<p>Paramters:
-- config: dict</p>
-<blockquote>
-<div><p>Configuration dictionary</p>
-</div></blockquote>
-<p>Returns:
-- logfile: str</p>
-<blockquote>
-<div><p>Path to logfile</p>
-</div></blockquote>
+<dd><p>Check if processing log file already exists, if not, create it, print date and time.</p>
+<p>The config file needs to contain the path information of the log file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – dict
+Configuration dictionary</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Path to logfile</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.find_gaps">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">find_gaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.find_gaps" title="Link to this definition"></a></dt>
 <dd><p>Find data gaps in a time series based on sampling interval.</p>
-<p>Parameters
-- df : pandas.DataFrame</p>
-<blockquote>
-<div><p>Must contain a ‘time’ column of datetime64.</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>v: str</dt><dd><p>Variable of the dataframe.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>var_dict<span class="classifier">dictionary</span></dt><dd><p>Inlcudes raw_sampling_time for each variable.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>gap_factor<span class="classifier">float, optional</span></dt><dd><p>Threshold factor (default 2.0).</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – pandas.DataFrame
+Must contain a ‘time’ column of datetime64.</p></li>
+<li><p><strong>v</strong> – str
+Variable of the dataframe.</p></li>
+<li><p><strong>var_dict</strong> – dict
+Inlcudes raw_sampling_time for each variable.</p></li>
+<li><p><strong>gap_factor</strong> – float, optional
+Threshold factor (default 2.0).</p></li>
 </ul>
-<p>Returns
-- pandas.DataFrame</p>
-<blockquote>
-<div><p>Each row is a gap interval: [start_time, end_time, gap_duration].</p>
-</div></blockquote>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Each row is a gap interval: [start_time, end_time, gap_duration].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.g_welmec">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">g_welmec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.g_welmec" title="Link to this definition"></a></dt>
-<dd><p>ratio of gravitational acceleration according to Welmec-Formula devided by 9.81</p>
-<p>Parameters:
-- lat: xarray.DataArray</p>
-<blockquote>
-<div><p>Latitude in degree</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>h: xarray.DataArray</dt><dd><p>height above sea level in m</p>
+<dd><p>Ratio of gravitational acceleration according to Welmec-Formula devided by 9.81.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> – xarray.DataArray
+Latitude in degree</p></li>
+<li><p><strong>h</strong> – xarray.DataArray
+height above sea level in m</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataarray with latitude and height dependent values of g.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
 </dd>
 </dl>
-</li>
-</ul>
-<p>Returns:
-- g_ratio: xarray.DataArray</p>
-<blockquote>
-<div><p>Dataarray with latitude and height dependent values of g.</p>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.get_global_attributes">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">get_global_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.get_global_attributes" title="Link to this definition"></a></dt>
-<dd><p>assigns attributes to the data set according to the config file.</p>
-<p>Parameters:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>data set which should get attributes</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>config: dict</dt><dd><p>configuration dictionary</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>instrument: str</dt><dd><p>instrument as called in the condig file</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>flight: int</dt><dd><p>flight number</p>
-</dd>
-</dl>
-</li>
+<dd><p>Assigns attributes to the data set according to the config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+data set which should get attributes</p></li>
+<li><p><strong>config</strong> – dict
+configuration dictionary</p></li>
+<li><p><strong>instrument</strong> – str
+instrument as called in the condig file</p></li>
+<li><p><strong>flight</strong> – int
+flight number</p></li>
 </ul>
-<p>Returns:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>data set with attributes.</p>
-</div></blockquote>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>data set with attributes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.get_timestamps">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">get_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.get_timestamps" title="Link to this definition"></a></dt>
-<dd><p>Repair timestamps to datetime64 datetimes</p>
-<p>Parameters:
-- df: pandas.DataFrame</p>
-<blockquote>
-<div><p>Dataframe with times and data imported from the DMS download.</p>
-</div></blockquote>
-<p>Returns:
-- df: pandas.DataFrame</p>
-<blockquote>
-<div><p>Dataframe with the same data but datetime64 timestamps.</p>
-</div></blockquote>
+<dd><p>Repair timestamps to datetime64 datetimes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> – pandas.DataFrame
+Dataframe with times and data imported from the DMS download.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataframe with the same data but datetime64 timestamps.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.get_variable_names">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">get_variable_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xml_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.get_variable_names" title="Link to this definition"></a></dt>
 <dd><p>Read a DMS order XML file and extract the variable names created by DMS.</p>
-<p>Background:
-- DMS filenames depend on the device configuration during specific flights or campaigns.
-- This function reads an XML order file (e.g., ‘RAD_flightname.xml’) and extracts</p>
-<blockquote>
-<div><p>variable names based on &lt;channel&gt; tags that include ‘deviceShortName’ and ‘channelShortName’.</p>
-</div></blockquote>
-<p>Paramters:
-- xml_file: str</p>
-<blockquote>
-<div><p>Location of the xml file, should be included in the config</p>
-</div></blockquote>
-<p>Returns:
-- variable_names: list</p>
-<blockquote>
-<div><p>List with all variable names in the xml file.</p>
-</div></blockquote>
+<p><strong>Background:</strong></p>
+<ul class="simple">
+<li><p>DMS filenames depend on the device configuration during specific flights or campaigns.</p></li>
+<li><p>This function reads an XML order file (e.g., ‘RAD_flightname.xml’) and extracts variable names based on &lt;channel&gt; tags that include ‘deviceShortName’ and ‘channelShortName’.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xml_file</strong> – str
+Location of the xml file, should be included in the config</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List with all variable names in the xml file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.import_data">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">import_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.import_data" title="Link to this definition"></a></dt>
-<dd><p>Import file for single variable using path and prefix for the specific flight from config file</p>
-<p>Parameters:
-- v: str</p>
-<blockquote>
-<div><p>Variable name</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>config: dict</dt><dd><p>Configuration dictionary</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>flight: int</dt><dd><p>Flight number</p>
-</dd>
-</dl>
-</li>
+<dd><p>Import file for single variable using path and prefix for the specific flight from config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> – str
+Variable name</p></li>
+<li><p><strong>config</strong> – dict
+Configuration dictionary</p></li>
+<li><p><strong>flight</strong> – int
+Flight number</p></li>
 </ul>
-<p>Returns:
-- df: pandas.DataFrame</p>
-<blockquote>
-<div><p>Dataframe with time and variable data.</p>
-</div></blockquote>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataframe with time and variable data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.import_device_data">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">import_device_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_offset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.import_device_data" title="Link to this definition"></a></dt>
-<dd><p>import data from different devices</p>
-<p>Parameters:
-- indir: str</p>
-<blockquote>
-<div><p>input directory</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>dev: str</dt><dd><p>device</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>time_offset: int</dt><dd><p>offset time in ms between device and noseboom to be defined in config file</p>
-</dd>
-</dl>
-</li>
+<dd><p>Import data from different devices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indir</strong> – str
+input directory</p></li>
+<li><p><strong>dev</strong> – str
+device</p></li>
+<li><p><strong>time_offset</strong> – int
+offset time in ms between device and noseboom to be defined in config file</p></li>
 </ul>
-<p>Returns:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>combined data from files in input directory</p>
-</div></blockquote>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>combined data from files in input directory</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.import_dictionary">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">import_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.import_dictionary" title="Link to this definition"></a></dt>
-<dd><p>Import config file for respective campaign and other dictionaries</p>
+<dd><p>Import config file for respective campaign and other dictionaries.</p>
 <p>The config file contains:
 - campaign information
 - Paths to xml-file, data</p>
-<p>Parameters:
-- yaml_file: .yaml file</p>
-<blockquote>
-<div><p>Dictionary containing basic information about the campaign</p>
-</div></blockquote>
-<p>Returns:
-- dict</p>
-<blockquote>
-<div><p>The config file as dictionary</p>
-</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>yaml_file</strong> – .yaml file
+Dictionary containing basic information about the campaign</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The config file as dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.import_radiation_data">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">import_radiation_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.import_radiation_data" title="Link to this definition"></a></dt>
-<dd><p>imports the radiation file from the DMS raw data</p>
-<p>Parameters:
-- fn: str</p>
-<blockquote>
-<div><p>filename</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>name: str</dt><dd><p>variable name</p>
+<dd><p>Imports the radiation file from the DMS raw data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fn</strong> – str
+filename</p></li>
+<li><p><strong>name</strong> – str
+variable name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>data set with variable data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
 </dd>
 </dl>
-</li>
-</ul>
-<p>Returns:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>data set with variable data</p>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.interpolate_time">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">interpolate_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.interpolate_time" title="Link to this definition"></a></dt>
 <dd><p>Linearly interpolate time on common timestamps with 100 Hz (or choose accordingly), convert to xarray dataset.</p>
-<p>Paramters:
-- df: pandas.DataFrame</p>
-<blockquote>
-<div><p>Dataframe containing data.</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>v: str</dt><dd><p>Variable name</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>var_dict: dict</dt><dd><p>Dictionary containing variable information. It should be specified in the config file.</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>steps: float</dt><dd><p>Optional, frequency specification given in s, default is 100 Hz, i.e. 0.01 s</p>
-</dd>
-</dl>
-</li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – pandas.DataFrame
+Dataframe containing data.</p></li>
+<li><p><strong>v</strong> – str
+Variable name</p></li>
+<li><p><strong>var_dict</strong> – dict
+Dictionary containing variable information. It should be specified in the config file.</p></li>
+<li><p><strong>steps</strong> – float
+Optional, frequency specification given in s, default is 100 Hz, i.e. 0.01 s</p></li>
 </ul>
-<p>Returns:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>Dataset interpolated to step frequency, default is 100 Hz.</p>
-</div></blockquote>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataset interpolated to step frequency, default is 100 Hz.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="polair._helpers.resample2sec">
 <span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">resample2sec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1s'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.resample2sec" title="Link to this definition"></a></dt>
-<dd><p>resample data to 1s (default) temporal resolution. e.g. if timestamps from DMS. Used method is ‘nearest’. This function is optional and not used per default</p>
-<p>Parameters:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>data to be resampled</p>
-</div></blockquote>
-<ul class="simple">
-<li><dl class="simple">
-<dt>resample: bool</dt><dd><p>resampling is only done if resample is put to True</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>freq: str</dt><dd><p>resampling frequency. Default is “1s” which corresponds to 1 second</p>
-</dd>
-</dl>
-</li>
+<dd><p>Resample data to 1s (default) temporal resolution.</p>
+<p>e.g. if timestamps from DMS. Used method is ‘nearest’. This function is optional and not used per default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+data to be resampled</p></li>
+<li><p><strong>resample</strong> – bool
+resampling is only done if resample is put to True</p></li>
+<li><p><strong>freq</strong> – str
+resampling frequency. Default is “1s” which corresponds to 1 second</p></li>
 </ul>
-<p>Returns:
-- ds: xarray.Dataset</p>
-<blockquote>
-<div><p>resampled dataset if sampling is put to True. Else ds is not changed</p>
-</div></blockquote>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>resampled dataset if sampling is put to True. Else ds is not changed</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
