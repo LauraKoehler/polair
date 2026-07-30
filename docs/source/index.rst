@@ -12,10 +12,11 @@ polair documentation
 .. toctree::
    :hidden:
 
-   Home <self>
+   Get started <self>
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
+   usage
+   howto
    api_documentation

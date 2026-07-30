@@ -10,6 +10,16 @@ processing different devices.
 | contact: laura.koehler@awi.de
 | date: 2026-05-08
 
+The device command processes data from other instruments than noseboom and t-bird.
+
+.. code-block:: bash
+
+    polair device -f <flight number> -c <config file> -i <instrument>  -p <platform>
+
+
+Options for instruments are mcpc, partector, partector_dms, kt19, and radiation.
+Platform `p` is optional with default being `polar6`, add if platform is `tbird`.
+
 """
 
 from . import _helpers as h

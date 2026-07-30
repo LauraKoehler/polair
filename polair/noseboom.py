@@ -10,6 +10,13 @@ noseboom processing.
 | contact: laura.koehler@awi.de
 | date: 2026-04-17
 
+The noseboom command determines the basic meteorological parameters from the calibrated raw data of the noseboom, which can be mounted at the nose of Polar 5 and 6.
+Adiabatic corrections are used and the wind components are determined.
+
+.. code-block:: bash
+
+    polair noseboom -f <flight number> -c <config file>
+
 """
 
 from . import _helpers as h
