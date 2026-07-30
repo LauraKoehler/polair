@@ -28,7 +28,6 @@ tests = [
 doc = [
     "sphinx",
     "myst-parser",
-    "furo",
     "sphinx_rtd_theme",
     ]
 
