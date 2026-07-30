@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API Documentation" href="api_documentation.html" /> 
+    <link rel="next" title="Usage" href="usage.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,10 +42,11 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Home</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Get started</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How to …</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api_documentation.html">API Documentation</a></li>
 </ul>
 
@@ -86,81 +87,24 @@
 </pre></div>
 </div>
 </section>
-<section id="preprocessing">
-<h3>preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading"></a></h3>
-<p>The preprocessing command converts all data in physical quantities. If necessary and provided, it calibrates the data. Finally, they are interpolated on common (default 100 Hz) time stamps. The command also checks for data gaps and sampling errors which are noted in the log file. The calibrated raw data will be saved as a netCDF file. The location needs to be specified in the configuration file of the campaign</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">polair</span> <span class="n">preprocessing</span> <span class="o">-</span><span class="n">f</span> <span class="o">&lt;</span><span class="n">flight</span> <span class="n">number</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">c</span> <span class="o">&lt;</span><span class="n">config</span> <span class="n">file</span><span class="o">&gt;</span>
-</pre></div>
-</div>
-</section>
-<section id="noseboom">
-<h3>noseboom<a class="headerlink" href="#noseboom" title="Link to this heading"></a></h3>
-<p>The noseboom command determines the basic meteorological parameters from the calibrated raw data of the noseboom which can be mounted at the nose of Polar 5 and 6. Adiabatic corrections are used and the wind components are determined.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">polair</span> <span class="n">noseboom</span> <span class="o">-</span><span class="n">f</span> <span class="o">&lt;</span><span class="n">flight</span> <span class="n">number</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">c</span> <span class="o">&lt;</span><span class="n">config</span> <span class="n">file</span><span class="o">&gt;</span>
-</pre></div>
-</div>
-</section>
-<section id="tbird">
-<h3>tbird<a class="headerlink" href="#tbird" title="Link to this heading"></a></h3>
-<p>The tbird command determines the meteorological parameters from the T-Bird similar to the noseboom command.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">polair</span> <span class="n">tbird</span> <span class="o">-</span><span class="n">f</span> <span class="o">&lt;</span><span class="n">flight</span> <span class="n">number</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">c</span> <span class="o">&lt;</span><span class="n">config</span> <span class="n">file</span><span class="o">&gt;</span>
-</pre></div>
-</div>
-</section>
-<section id="device">
-<h3>device<a class="headerlink" href="#device" title="Link to this heading"></a></h3>
-<p>The device command processes data from other instruments than noseboom and t-bird.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">polair</span> <span class="n">device</span> <span class="o">-</span><span class="n">f</span> <span class="o">&lt;</span><span class="n">flight</span> <span class="n">number</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">c</span> <span class="o">&lt;</span><span class="n">config</span> <span class="n">file</span><span class="o">&gt;</span> <span class="o">-</span><span class="n">i</span> <span class="o">&lt;</span><span class="n">instrument</span><span class="o">&gt;</span>  <span class="o">-</span><span class="n">p</span> <span class="o">&lt;</span><span class="n">platform</span><span class="o">&gt;</span>
-</pre></div>
-</div>
-<p>Options for instruments are mcpc, partector, partector_dms, kt19, and radiation. Platform p is optional with polar6, add if platform is tbird.</p>
-</section>
-</section>
-<section id="useful-code">
-<h2>Useful code<a class="headerlink" href="#useful-code" title="Link to this heading"></a></h2>
-<section id="find-corrupted-lines-in-dms-files">
-<h3>Find corrupted lines in DMS files<a class="headerlink" href="#find-corrupted-lines-in-dms-files" title="Link to this heading"></a></h3>
-<p>When downloading the data from the DMS system, it happens that there errors in the files such as broken lines, special charachters, missing entries,… When this is the case, the polair package fails in processing these data. Thus, the corrupted lines have to be removed. Here, we provide some code examples which can be used to quickly identify the corrupted line. In most of the cases, this works:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">corrupted_file</span><span class="o">&gt;</span>
-
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unicode error in line </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">[:</span><span class="mi">200</span><span class="p">])</span>  <span class="c1"># show beginning of bad line</span>
-            <span class="k">break</span>
-</pre></div>
-</div>
-<p>This gives the corrupted line number. However, empty lines are not counted. So, if every second line is empty, you need to double the result. If this is not working, try</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fn</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">corrupted_file</span><span class="o">&gt;</span>
-
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">header</span>  <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;time&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;var&quot;</span><span class="p">])</span>
-<span class="n">bad_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">15</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>bad_idx gives lines with broken timestamps. Duplicated timestamps could also cause problems:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dup_times</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(),</span> <span class="s2">&quot;time&quot;</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>After removing the corrupted lines manually, the polair commands should work.</p>
-</section>
-<section id="convert-yaml-to-html">
-<h3>Convert yaml to html<a class="headerlink" href="#convert-yaml-to-html" title="Link to this heading"></a></h3>
-</section>
 </section>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#cli-modules">CLI modules</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How to …</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#find-corrupted-lines-in-dms-files">Find corrupted lines in DMS files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="howto.html#convert-yaml-to-html">Convert yaml to html</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="api_documentation.html">API Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api_documentation.html#module-polair.device">device</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api_documentation.html#module-polair.noseboom">noseboom</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api_documentation.html#module-polair.preprocessing">preprocessing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api_documentation.html#module-polair.tbird">tbird</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api_documentation.html#module-polair._helpers">helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_documentation.html#module-polair._calibration">calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_documentation.html#module-polair._corr_fcts">corr_fcts</a></li>
 </ul>
 </li>
 </ul>
@@ -171,7 +115,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="api_documentation.html" class="btn btn-neutral float-right" title="API Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
