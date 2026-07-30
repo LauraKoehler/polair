@@ -1,0 +1,1178 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Documentation &mdash; polair v1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=76e2d817"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="How to …" href="howto.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            polair
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Get started</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">How to …</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-polair._helpers">helpers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.add2logfile"><code class="docutils literal notranslate"><span class="pre">add2logfile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.add_attrs_var"><code class="docutils literal notranslate"><span class="pre">add_attrs_var()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.add_global_attrs"><code class="docutils literal notranslate"><span class="pre">add_global_attrs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.add_segment_coordinate"><code class="docutils literal notranslate"><span class="pre">add_segment_coordinate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.check_sampling"><code class="docutils literal notranslate"><span class="pre">check_sampling()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.convert_unit"><code class="docutils literal notranslate"><span class="pre">convert_unit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.create_logfile"><code class="docutils literal notranslate"><span class="pre">create_logfile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.find_gaps"><code class="docutils literal notranslate"><span class="pre">find_gaps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.g_welmec"><code class="docutils literal notranslate"><span class="pre">g_welmec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.get_global_attributes"><code class="docutils literal notranslate"><span class="pre">get_global_attributes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.get_timestamps"><code class="docutils literal notranslate"><span class="pre">get_timestamps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.get_variable_names"><code class="docutils literal notranslate"><span class="pre">get_variable_names()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.import_data"><code class="docutils literal notranslate"><span class="pre">import_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.import_device_data"><code class="docutils literal notranslate"><span class="pre">import_device_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.import_dictionary"><code class="docutils literal notranslate"><span class="pre">import_dictionary()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.import_radiation_data"><code class="docutils literal notranslate"><span class="pre">import_radiation_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.interpolate_time"><code class="docutils literal notranslate"><span class="pre">interpolate_time()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._helpers.resample2sec"><code class="docutils literal notranslate"><span class="pre">resample2sec()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-polair._calibration">calibration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#polair._calibration.cal"><code class="docutils literal notranslate"><span class="pre">cal()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-polair._corr_fcts">corr_fcts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.alignement_correction"><code class="docutils literal notranslate"><span class="pre">alignement_correction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.ampbox2lwr_pyrgeometer"><code class="docutils literal notranslate"><span class="pre">ampbox2lwr_pyrgeometer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.ampbox2swr_pyranometer"><code class="docutils literal notranslate"><span class="pre">ampbox2swr_pyranometer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.angle_diff"><code class="docutils literal notranslate"><span class="pre">angle_diff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.check_flow"><code class="docutils literal notranslate"><span class="pre">check_flow()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.correct_ins_with_gps"><code class="docutils literal notranslate"><span class="pre">correct_ins_with_gps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.correct_ttrk_inat_with_gps"><code class="docutils literal notranslate"><span class="pre">correct_ttrk_inat_with_gps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.correct_ttrk_ins_with_gps"><code class="docutils literal notranslate"><span class="pre">correct_ttrk_ins_with_gps()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.get_h_ins"><code class="docutils literal notranslate"><span class="pre">get_h_ins()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.get_radiation"><code class="docutils literal notranslate"><span class="pre">get_radiation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.get_true_air_speed"><code class="docutils literal notranslate"><span class="pre">get_true_air_speed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.get_w_ins"><code class="docutils literal notranslate"><span class="pre">get_w_ins()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.get_wind_component"><code class="docutils literal notranslate"><span class="pre">get_wind_component()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.humidity_correction"><code class="docutils literal notranslate"><span class="pre">humidity_correction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.mask_out_peaks"><code class="docutils literal notranslate"><span class="pre">mask_out_peaks()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.mask_ttrk_thdg"><code class="docutils literal notranslate"><span class="pre">mask_ttrk_thdg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.resistance2temperature"><code class="docutils literal notranslate"><span class="pre">resistance2temperature()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.reverse_antennas"><code class="docutils literal notranslate"><span class="pre">reverse_antennas()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.sat_correction"><code class="docutils literal notranslate"><span class="pre">sat_correction()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.sat_pressure"><code class="docutils literal notranslate"><span class="pre">sat_pressure()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.stp_conditions"><code class="docutils literal notranslate"><span class="pre">stp_conditions()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.true_track_xarray"><code class="docutils literal notranslate"><span class="pre">true_track_xarray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#polair._corr_fcts.unwrap_with_nans"><code class="docutils literal notranslate"><span class="pre">unwrap_with_nans()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">polair</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api_documentation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-documentation">
+<h1>API Documentation<a class="headerlink" href="#api-documentation" title="Link to this heading"></a></h1>
+<section id="module-polair._helpers">
+<span id="helpers"></span><h2>helpers<a class="headerlink" href="#module-polair._helpers" title="Link to this heading"></a></h2>
+<p>Functions for DMS data processing</p>
+<p>Part of the polair package.</p>
+<div class="line-block">
+<div class="line">title: _helpers.py</div>
+<div class="line">author: Laura Köhler</div>
+<div class="line">institution: Alfred-Wegener-Institut, Bremerhaven, Germany</div>
+<div class="line">contact: <a class="reference external" href="mailto:laura&#46;koehler&#37;&#52;&#48;awi&#46;de">laura<span>&#46;</span>koehler<span>&#64;</span>awi<span>&#46;</span>de</a></div>
+<div class="line">date: 2026-04-17</div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.add2logfile">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">add2logfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.add2logfile" title="Link to this definition"></a></dt>
+<dd><p>Writes text in the logfile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logfile</strong> – .txt file
+Logfile for the processing, location defined in the config file</p></li>
+<li><p><strong>text</strong> – str
+Text which should be added to the logfile</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.add_attrs_var">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">add_attrs_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.add_attrs_var" title="Link to this definition"></a></dt>
+<dd><p>This function adds all attributes from the variable dictrionary except for the old name which is only necessary to read in the correct file.</p>
+<p>It adds the original unit because no unit conversion is done so far.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+Input dataset</p></li>
+<li><p><strong>v</strong> – str
+Variable for which attributes are added</p></li>
+<li><p><strong>var_dict</strong> – dict
+Dictionary with all the information for each parameter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataset with added attributes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.add_global_attrs">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">add_global_attrs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.add_global_attrs" title="Link to this definition"></a></dt>
+<dd><p>This function adds metadata to the data set as stated in the config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+Input data set</p></li>
+<li><p><strong>config</strong> – dict
+config file containing campaign information</p></li>
+<li><p><strong>flight</strong> – int
+research flight which is processed</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.add_segment_coordinate">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">add_segment_coordinate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.add_segment_coordinate" title="Link to this definition"></a></dt>
+<dd><p>Assigns segment coordinate to a data set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+data set which is supposed to get the segment coordinate</p></li>
+<li><p><strong>config</strong> – dict
+configuration dictionary</p></li>
+<li><p><strong>flight</strong> – int
+flight number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>data set with segment coordinate</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.check_sampling">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">check_sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfile</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.check_sampling" title="Link to this definition"></a></dt>
+<dd><p>Check if sampling interval in df[‘time’] matches expected_sampling (seconds).</p>
+<p>95% of samples should match within tolerance. Identified gaps and sampling issues are written in the logfile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – pandas.DataFrame
+Dataframe with data</p></li>
+<li><p><strong>v</strong> – str
+Variable name</p></li>
+<li><p><strong>var_dict</strong> – dict
+Dictionary with varible information</p></li>
+<li><p><strong>logfile</strong> – str
+Logfile path</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.convert_unit">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">convert_unit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.convert_unit" title="Link to this definition"></a></dt>
+<dd><p>This function converts the unit from the original unit to the final (SI) unit specified in the variable information.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+Input dataset</p></li>
+<li><p><strong>var_dict</strong> – dict
+Dictionary with variable (unit) information</p></li>
+<li><p><strong>v</strong> – str
+Variable for which unit should be converted</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataset with converted units</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.create_logfile">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">create_logfile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.create_logfile" title="Link to this definition"></a></dt>
+<dd><p>Check if processing log file already exists, if not, create it, print date and time.</p>
+<p>The config file needs to contain the path information of the log file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> – dict
+Configuration dictionary</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Path to logfile</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.find_gaps">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">find_gaps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gap_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.find_gaps" title="Link to this definition"></a></dt>
+<dd><p>Find data gaps in a time series based on sampling interval.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – pandas.DataFrame
+Must contain a ‘time’ column of datetime64.</p></li>
+<li><p><strong>v</strong> – str
+Variable of the dataframe.</p></li>
+<li><p><strong>var_dict</strong> – dict
+Inlcudes raw_sampling_time for each variable.</p></li>
+<li><p><strong>gap_factor</strong> – float, optional
+Threshold factor (default 2.0).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Each row is a gap interval: [start_time, end_time, gap_duration].</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.g_welmec">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">g_welmec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.g_welmec" title="Link to this definition"></a></dt>
+<dd><p>Ratio of gravitational acceleration according to Welmec-Formula devided by 9.81.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> – xarray.DataArray
+Latitude in degree</p></li>
+<li><p><strong>h</strong> – xarray.DataArray
+height above sea level in m</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataarray with latitude and height dependent values of g.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.get_global_attributes">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">get_global_attributes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.get_global_attributes" title="Link to this definition"></a></dt>
+<dd><p>Assigns attributes to the data set according to the config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+data set which should get attributes</p></li>
+<li><p><strong>config</strong> – dict
+configuration dictionary</p></li>
+<li><p><strong>instrument</strong> – str
+instrument as called in the condig file</p></li>
+<li><p><strong>flight</strong> – int
+flight number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>data set with attributes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.get_timestamps">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">get_timestamps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.get_timestamps" title="Link to this definition"></a></dt>
+<dd><p>Repair timestamps to datetime64 datetimes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>df</strong> – pandas.DataFrame
+Dataframe with times and data imported from the DMS download.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataframe with the same data but datetime64 timestamps.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.get_variable_names">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">get_variable_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xml_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.get_variable_names" title="Link to this definition"></a></dt>
+<dd><p>Read a DMS order XML file and extract the variable names created by DMS.</p>
+<p><strong>Background:</strong></p>
+<ul class="simple">
+<li><p>DMS filenames depend on the device configuration during specific flights or campaigns.</p></li>
+<li><p>This function reads an XML order file (e.g., ‘RAD_flightname.xml’) and extracts variable names based on &lt;channel&gt; tags that include ‘deviceShortName’ and ‘channelShortName’.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>xml_file</strong> – str
+Location of the xml file, should be included in the config</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List with all variable names in the xml file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.import_data">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">import_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flight</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.import_data" title="Link to this definition"></a></dt>
+<dd><p>Import file for single variable using path and prefix for the specific flight from config file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> – str
+Variable name</p></li>
+<li><p><strong>config</strong> – dict
+Configuration dictionary</p></li>
+<li><p><strong>flight</strong> – int
+Flight number</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataframe with time and variable data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.import_device_data">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">import_device_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dev</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_offset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.import_device_data" title="Link to this definition"></a></dt>
+<dd><p>Import data from different devices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indir</strong> – str
+input directory</p></li>
+<li><p><strong>dev</strong> – str
+device</p></li>
+<li><p><strong>time_offset</strong> – int
+offset time in ms between device and noseboom to be defined in config file</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>combined data from files in input directory</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.import_dictionary">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">import_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.import_dictionary" title="Link to this definition"></a></dt>
+<dd><p>Import config file for respective campaign and other dictionaries.</p>
+<p>The config file contains:
+- campaign information
+- Paths to xml-file, data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>yaml_file</strong> – .yaml file
+Dictionary containing basic information about the campaign</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The config file as dictionary</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.import_radiation_data">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">import_radiation_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.import_radiation_data" title="Link to this definition"></a></dt>
+<dd><p>Imports the radiation file from the DMS raw data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fn</strong> – str
+filename</p></li>
+<li><p><strong>name</strong> – str
+variable name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>data set with variable data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.interpolate_time">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">interpolate_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.interpolate_time" title="Link to this definition"></a></dt>
+<dd><p>Linearly interpolate time on common timestamps with 100 Hz (or choose accordingly), convert to xarray dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – pandas.DataFrame
+Dataframe containing data.</p></li>
+<li><p><strong>v</strong> – str
+Variable name</p></li>
+<li><p><strong>var_dict</strong> – dict
+Dictionary containing variable information. It should be specified in the config file.</p></li>
+<li><p><strong>steps</strong> – float
+Optional, frequency specification given in s, default is 100 Hz, i.e. 0.01 s</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataset interpolated to step frequency, default is 100 Hz.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._helpers.resample2sec">
+<span class="sig-prename descclassname"><span class="pre">polair._helpers.</span></span><span class="sig-name descname"><span class="pre">resample2sec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1s'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._helpers.resample2sec" title="Link to this definition"></a></dt>
+<dd><p>Resample data to 1s (default) temporal resolution.</p>
+<p>e.g. if timestamps from DMS. Used method is ‘nearest’. This function is optional and not used per default.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+data to be resampled</p></li>
+<li><p><strong>resample</strong> – bool
+resampling is only done if resample is put to True</p></li>
+<li><p><strong>freq</strong> – str
+resampling frequency. Default is “1s” which corresponds to 1 second</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>resampled dataset if sampling is put to True. Else ds is not changed</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-polair._calibration">
+<span id="calibration"></span><h2>calibration<a class="headerlink" href="#module-polair._calibration" title="Link to this heading"></a></h2>
+<p>Definitions of DMS output calibration functions.</p>
+<p>Part of the polair package.</p>
+<div class="line-block">
+<div class="line">title: _calibration.py</div>
+<div class="line">author: Laura Köhler</div>
+<div class="line">institution: Alfred-Wegener-Institut, Bremerhaven, Germany</div>
+<div class="line">contact: <a class="reference external" href="mailto:laura&#46;koehler&#37;&#52;&#48;awi&#46;de">laura<span>&#46;</span>koehler<span>&#64;</span>awi<span>&#46;</span>de</a></div>
+<div class="line">date: 2026-04-17</div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._calibration.cal">
+<span class="sig-prename descclassname"><span class="pre">polair._calibration.</span></span><span class="sig-name descname"><span class="pre">cal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cal_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fn_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._calibration.cal" title="Link to this definition"></a></dt>
+<dd><p>Calibrate DMS data and calculate physical values from analog output when necessary.</p>
+<p>Applies different calibration methods based on variable type:
+- Pressure transducers (psT, psB, psN)
+- Five-hole probe pressures (qaT, qbT, qcT, etc.)
+- Temperature and other sensors with quadratic calibration
+- GPS/INS messages with special parsing
+- Radiation sensor temperatures with Callendar-Van-Dusen equation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> – str
+Variable name to be calibrated</p></li>
+<li><p><strong>cal_file</strong> – dict
+Dictionary with calibration coefficients for the campaign</p></li>
+<li><p><strong>df</strong> – pandas.DataFrame
+DataFrame with raw data to be calibrated</p></li>
+<li><p><strong>fn_prefix</strong> – str
+Filename prefix for loading auxiliary data (e.g., temperature files)</p></li>
+<li><p><strong>var_dict</strong> – dict
+Dictionary with variable metadata and old names</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame with calibrated values for variable v</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-polair._corr_fcts">
+<span id="corr-fcts"></span><h2>corr_fcts<a class="headerlink" href="#module-polair._corr_fcts" title="Link to this heading"></a></h2>
+<p>Definitions needed for aircraft noseboom and tbird processing.</p>
+<p>Part of the polair package.</p>
+<div class="line-block">
+<div class="line">title: _corr_fcts.py</div>
+<div class="line">author: Laura Köhler</div>
+<div class="line">institution: Alfred-Wegener-Institut, Bremerhaven, Germany</div>
+<div class="line">contact: <a class="reference external" href="mailto:laura&#46;koehler&#37;&#52;&#48;awi&#46;de">laura<span>&#46;</span>koehler<span>&#64;</span>awi<span>&#46;</span>de</a></div>
+<div class="line">date: 2026-04-17</div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.alignement_correction">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">alignement_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fhp_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">twist_angle</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.alignement_correction" title="Link to this definition"></a></dt>
+<dd><p>Apply alignment corrections from mounting of the noseboom/t-bird.</p>
+<p>Parameters are determined from calibration segments with manual evaluation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – xarray.Dataset
+100 Hz calibrated data</p></li>
+<li><p><strong>fhp_params</strong> – dict
+Dictionary with parameters for the five-hole probes</p></li>
+<li><p><strong>platform</strong> – str
+“noseboom” or “tbird”</p></li>
+<li><p><strong>twist_angle</strong> – float
+Rotation angle of the sonde (in degrees, from config file)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataset with corrected values</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.ampbox2lwr_pyrgeometer">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">ampbox2lwr_pyrgeometer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">I</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.ampbox2lwr_pyrgeometer" title="Link to this definition"></a></dt>
+<dd><p>Convert pyrgeometer current to longwave radiation.</p>
+<p>Includes temperature correction using Stefan-Boltzmann law.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>I</strong> – xarray.DataArray
+Raw current in A</p></li>
+<li><p><strong>T</strong> – xarray.DataArray
+Body temperature in K</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Longwave radiation in W/m²</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.ampbox2swr_pyranometer">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">ampbox2swr_pyranometer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">I</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.ampbox2swr_pyranometer" title="Link to this definition"></a></dt>
+<dd><p>Convert pyranometer current to shortwave radiation.</p>
+<p>Based on ampbox manual: 1 mV input → 1 mA output, so 4-20 mA represents 0-16 mV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>I</strong> – xarray.DataArray
+Raw current in A</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Radiation in W/m²</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.angle_diff">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">angle_diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.angle_diff" title="Link to this definition"></a></dt>
+<dd><p>Calculate the shortest angle difference between two angles to determine peaks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> – xarray.DataArray
+Angle a (radians)</p></li>
+<li><p><strong>b</strong> – xarray.DataArray
+Angle b (radians)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Shortest angle difference in degrees [-180, 180)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.check_flow">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">check_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refvar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'flow_rate'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.check_flow" title="Link to this definition"></a></dt>
+<dd><p>Remove flow anomalies where flow rate varies more than specified percentage from average.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+Data</p></li>
+<li><p><strong>refvar</strong> – str, optional
+Variable used to check flow rate (default: “flow_rate”)</p></li>
+<li><p><strong>variance</strong> – float, optional
+Allowed deviation from mean (default: 0.1 = 10%)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Data with flow anomalies removed</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.correct_ins_with_gps">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">correct_ins_with_gps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.correct_ins_with_gps" title="Link to this definition"></a></dt>
+<dd><p>Stabilize INS data using GPS measurements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – xarray.Dataset
+100 Hz calibrated data</p></li>
+<li><p><strong>v</strong> – str
+Variable to correct (options: “lon”, “lat”, “gs”, “h_ins”, “w_ins”, “vew”, “vns”)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>GPS-corrected data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.correct_ttrk_inat_with_gps">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">correct_ttrk_inat_with_gps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_corr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.correct_ttrk_inat_with_gps" title="Link to this definition"></a></dt>
+<dd><p>Correct INS true track using GPS with unwrapping.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – xarray.Dataset
+100 Hz calibrated data</p></li>
+<li><p><strong>data_corr</strong> – xarray.Dataset
+Data including ttrk with switched antenna correction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>GPS-corrected INAT true track</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.correct_ttrk_ins_with_gps">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">correct_ttrk_ins_with_gps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_corr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.correct_ttrk_ins_with_gps" title="Link to this definition"></a></dt>
+<dd><p>True heading correction from INS by GPS</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – xarray.Dataset
+100 Hz calibrated data</p></li>
+<li><p><strong>data_corr</strong> – xarray.Dataset
+GPS-corrected data (from correct_ins_with_gps)</p></li>
+<li><p><strong>v</strong> – str
+Variable to correct (only “ttrk” supported)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>GPS-corrected true track</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.get_h_ins">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">get_h_ins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.get_h_ins" title="Link to this definition"></a></dt>
+<dd><p>Calculate aircraft altitude from vertical acceleration and velocity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w</strong> – xarray.Dataset
+Vertical velocity dataset</p></li>
+<li><p><strong>deltat</strong> – float, optional
+Sampling rate in seconds (default: 0.01 for 100 Hz data)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Aircraft altitude from INS</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.get_radiation">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">get_radiation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_vars</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.get_radiation" title="Link to this definition"></a></dt>
+<dd><p>Calculate body temperatures and radiation from DMS raw data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> – dict
+Configuration dictionary</p></li>
+<li><p><strong>flight</strong> – int
+Flight number</p></li>
+<li><p><strong>out_vars</strong> – dict
+Dictionary with output variables</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataset with longwave and shortwave radiation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.get_true_air_speed">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">get_true_air_speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.get_true_air_speed" title="Link to this definition"></a></dt>
+<dd><p>Calculate true airspeed from air density.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – xarray.Dataset
+Data with corrected variables (adiabatic corrected Te_N_corr and ps)</p></li>
+<li><p><strong>platform</strong> – str
+“noseboom” or “tbird”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True airspeed</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.get_w_ins">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">get_w_ins</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deltat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.get_w_ins" title="Link to this definition"></a></dt>
+<dd><p>Calculate vertical velocity from INS vertical acceleration and remove Schuler oscillation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – xarray.Dataset
+Calibrated data</p></li>
+<li><p><strong>start</strong> – numpy.datetime64
+Start time of the flight (from config)</p></li>
+<li><p><strong>stop</strong> – numpy.datetime64
+End time of the flight (from config)</p></li>
+<li><p><strong>deltat</strong> – float, optional
+Sampling rate in seconds (default: 0.01 for 100 Hz data)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vertical velocity from INS with Schuler oscillation removed</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.get_wind_component">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">get_wind_component</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_corr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.get_wind_component" title="Link to this definition"></a></dt>
+<dd><p>Calculate wind components from calibrated raw data and corrected data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – xarray.Dataset
+Dataset with raw data</p></li>
+<li><p><strong>data_corr</strong> – xarray.Dataset
+Dataset with corrected data</p></li>
+<li><p><strong>component</strong> – str
+Wind component (“u”, “v”, or “vertwind”)</p></li>
+<li><p><strong>platform</strong> – str
+“noseboom” or “tbird”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Wind component</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.humidity_correction">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">humidity_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_sensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T_amb</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.humidity_correction" title="Link to this definition"></a></dt>
+<dd><p>Apply adiabatic correction to relative humidity.</p>
+<p>Cuts values larger than 1.0 (limits of adiabatic correction).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rh</strong> – xarray.DataArray
+Relative humidity from humicap</p></li>
+<li><p><strong>T_sensor</strong> – xarray.DataArray
+Humidity sensor temperature in K</p></li>
+<li><p><strong>T_amb</strong> – xarray.DataArray
+Ambient temperature in K</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Corrected relative humidity (capped at 1.0)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.mask_out_peaks">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">mask_out_peaks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">refvar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'p_amb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timedelta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.mask_out_peaks" title="Link to this definition"></a></dt>
+<dd><p>Mask out peaks in data based on pressure changes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+Data</p></li>
+<li><p><strong>refvar</strong> – str, optional
+Variable used to check for peaks (default: “p_amb”)</p></li>
+<li><p><strong>threshold</strong> – float, optional
+Threshold to identify peaks (default: 5000 Pa)</p></li>
+<li><p><strong>timedelta</strong> – int, optional
+Time window in seconds for peak detection (default: 1 s)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Data with peaks removed</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.mask_ttrk_thdg">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">mask_ttrk_thdg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ttrk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thdg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.mask_ttrk_thdg" title="Link to this definition"></a></dt>
+<dd><p>Mask regions where true track and true heading differ significantly.</p>
+<p>Also masks 2-second windows around unphysical peaks in curves.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ttrk</strong> – xarray.DataArray
+True track (radians)</p></li>
+<li><p><strong>thdg</strong> – xarray.DataArray
+True heading (radians)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(masked ttrk, masked thdg) in radians</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.resistance2temperature">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">resistance2temperature</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.resistance2temperature" title="Link to this definition"></a></dt>
+<dd><p>Convert PT-100 resistance in Ohm in radiation sensors to temperature in K using Callendar-Van-Dusen equation ((<a class="reference external" href="https://de.wikipedia.org/wiki/Callendar-Van-Dusen-Gleichung">https://de.wikipedia.org/wiki/Callendar-Van-Dusen-Gleichung</a>), a, b from Datasheet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>R</strong> – xarray.DataArray
+Resistance in Ohm</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Temperature in K</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.reverse_antennas">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">reverse_antennas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.reverse_antennas" title="Link to this definition"></a></dt>
+<dd><p>Apply antenna switching correction.</p>
+<p>If shift=True: shifts angle by 180° (possible reason: switched antennas in iNAT).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+Calibrated data</p></li>
+<li><p><strong>angle</strong> – str
+Angle variable to be switched (e.g., “roll_inat”, “pitch_inat”, “thdg”)</p></li>
+<li><p><strong>shift</strong> – bool
+Whether to apply 180° shift (True) or keep original (False)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Shifted data if shift=True, else unchanged data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.sat_correction">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">sat_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_corr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recovery</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.sat_correction" title="Link to this definition"></a></dt>
+<dd><p>Compute static air temperature from TAT using adiabatic correction.</p>
+<p>Recovery is a correction for deiced sensor (recovery=1.00025).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+Dataset with all variables</p></li>
+<li><p><strong>ds_corr</strong> – xarray.Dataset
+Dataset with corrected variables (not used in docstring but present in code)</p></li>
+<li><p><strong>t</strong> – str
+Temperature variable name</p></li>
+<li><p><strong>recovery</strong> – float, optional
+Recovery factor for deiced sensor (default: 1.00025)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Corrected temperature</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.sat_pressure">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">sat_pressure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.sat_pressure" title="Link to this definition"></a></dt>
+<dd><p>Calculate saturation pressure using the Magnus formula.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>temp</strong> – xarray.DataArray
+Temperature in Kelvin</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Saturation pressure in hPa</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.stp_conditions">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">stp_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'t_amb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pres</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'p_amb'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.stp_conditions" title="Link to this definition"></a></dt>
+<dd><p>Add variables reduced to standard temperature and pressure (STP).
+The dataset needs to have the device internal temperature and pressure</p>
+<p>STP conditions: p₀ = 1013 hPa, T₀ = 0°C.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – xarray.Dataset
+Dataset with variables to reduce to STP, ambient temperature and pressure</p></li>
+<li><p><strong>temp</strong> – str, optional
+Name of temperature variable (default: “t_amb”)</p></li>
+<li><p><strong>pres</strong> – str, optional
+Name of pressure variable (default: “p_amb”)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataset with additional STP-corrected variables</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.true_track_xarray">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">true_track_xarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lon2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.true_track_xarray" title="Link to this definition"></a></dt>
+<dd><p>Calculate the true track (bearing) between two geographic points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat1</strong> – xarray.DataArray
+Latitude at start point (degrees)</p></li>
+<li><p><strong>lon1</strong> – xarray.DataArray
+Longitude at start point (degrees)</p></li>
+<li><p><strong>lat2</strong> – xarray.DataArray
+Latitude at end point (degrees)</p></li>
+<li><p><strong>lon2</strong> – xarray.DataArray
+Longitude at end point (degrees)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True track (bearing) in degrees [0, 360)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="polair._corr_fcts.unwrap_with_nans">
+<span class="sig-prename descclassname"><span class="pre">polair._corr_fcts.</span></span><span class="sig-name descname"><span class="pre">unwrap_with_nans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">da</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">360</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#polair._corr_fcts.unwrap_with_nans" title="Link to this definition"></a></dt>
+<dd><p>Unwrap angle data while preserving NaN positions.</p>
+<p>Interpolates over NaNs to enable unwrapping, then restores original NaNs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>da</strong> – xarray.DataArray
+Angle data to be unwrapped (degrees)</p></li>
+<li><p><strong>period</strong> – float, optional
+Period for unwrapping (default: 360 for degrees)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Unwrapped data array with NaNs at original positions</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xarray.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="howto.html" class="btn btn-neutral float-left" title="How to …" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Laura Köhler.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,11 +1,25 @@
 """
-titile: preprocessing.py
-author: Laura Köhler
-institution: Alfred-Wegener-Institut, Bremerhaven, Germany
-contact: laura.koehler@awi.de
-date: 2026-04-17
-content: preprocessing command to convert all data to physical, calibrated values
-comment: part of polair package
+Preprocessing command to convert all data to physical, calibrated values
+
+This module is part of the polair package.
+
+| title: preprocessing.py
+| author: Laura Köhler
+| institution: Alfred-Wegener-Institut, Bremerhaven, Germany
+| contact: laura.koehler@awi.de
+| date: 2026-04-17
+
+The preprocessing command converts all data in physical quantities.
+If necessary and provided, it calibrates the data.
+Finally, they are interpolated on common (default 100 Hz) time stamps.
+The command also checks for data gaps and sampling errors which are noted in the log file.
+The calibrated raw data will be saved as a netCDF file.
+The location needs to be specified in the configuration file of the campaign.
+
+.. code-block:: bash
+
+    polair preprocessing -f <flight number> -c <config file>
+
 """
 
 from . import _helpers as h

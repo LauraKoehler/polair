@@ -1,11 +1,25 @@
 """
-titile: device.py
-author: Laura Köhler
-institution: Alfred-Wegener-Institut, Bremerhaven, Germany
-contact: laura.koehler@awi.de
-date: 2026-05-08
-content: processing command for different devices
-comment: part of polair package
+Processing command for different devices
+
+This module is part of the polair package and provides functionality for
+processing different devices.
+
+| title: device.py
+| author: Laura Köhler
+| institution: Alfred-Wegener-Institut, Bremerhaven, Germany
+| contact: laura.koehler@awi.de
+| date: 2026-05-08
+
+The device command processes data from other instruments than noseboom and t-bird.
+
+.. code-block:: bash
+
+    polair device -f <flight number> -c <config file> -i <instrument>  -p <platform>
+
+
+Options for instruments are mcpc, partector, partector_dms, kt19, and radiation.
+Platform `p` is optional with default being `polar6`, add if platform is `tbird`.
+
 """
 
 from . import _helpers as h

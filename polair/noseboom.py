@@ -1,11 +1,22 @@
 """
-title: noseboom.py
-author: Laura Köhler
-institution: Alfred-Wegener-Institut, Bremerhaven, Germany
-contact: laura.koehler@awi.de
-date: 2026-04-17
-content: noseboom processing command
-comment: part of polair package
+Noseboom processing command.
+
+This module is part of the polair package and provides functionality for
+noseboom processing.
+
+| title: noseboom.py
+| author: Laura Köhler
+| institution: Alfred-Wegener-Institut, Bremerhaven, Germany
+| contact: laura.koehler@awi.de
+| date: 2026-04-17
+
+The noseboom command determines the basic meteorological parameters from the calibrated raw data of the noseboom, which can be mounted at the nose of Polar 5 and 6.
+Adiabatic corrections are used and the wind components are determined.
+
+.. code-block:: bash
+
+    polair noseboom -f <flight number> -c <config file>
+
 """
 
 from . import _helpers as h

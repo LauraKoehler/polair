@@ -1,11 +1,21 @@
 """
-titile: tbird.py
-author: Laura Köhler
-institution: Alfred-Wegener-Institut, Bremerhaven, Germany
-contact: laura.koehler@awi.de
-date: 2026-04-17
-content: T-Bird processing command
-comment: part of polair package
+T-Bird processing command
+
+This module is part of the polair package and provides functionality for
+processing the T-Bitd data.
+
+| title: tbird.py
+| author: Laura Köhler
+| institution: Alfred-Wegener-Institut, Bremerhaven, Germany
+| contact: laura.koehler@awi.de
+| date: 2026-04-17
+
+The tbird command determines the meteorological parameters from the T-Bird similar to the noseboom command.
+
+.. code-block:: bash
+
+    polair tbird -f <flight number> -c <config file>
+
 """
 
 from . import _helpers as h
