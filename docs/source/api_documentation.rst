@@ -8,11 +8,11 @@ API Documentation
 noseboom
 ----------
 
-.. automodule: polair.noseboom
+.. automodule:: polair.noseboom
    :members:
 
 helpers
 -----------
 
-.. automodule: polair.helpers
+.. automodule:: polair._helpers
    :members:
