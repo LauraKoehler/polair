@@ -133,7 +133,7 @@ def import_data(v, config, flight):
         pandas.DataFrame: Dataframe with time and variable data.
     """
     old_name = vars[v]["old"]
-    fn = f"{config["flights"][flight]["data_dir"]}/{config["flights"][flight]["prefix"]}{old_name}.dat"
+    fn = f"{config['flights'][flight]['data_dir']}/{config['flights'][flight]['prefix']}{old_name}.dat"
     df = pd.read_csv(fn, header  = 4, sep = r'\s+', names = ["date", "time", f"{v}"])
     return df
 
@@ -306,7 +306,7 @@ def add_global_attrs(ds, config, flight):
     """
     attrs = config["metadata"]
     ds.attrs = attrs
-    title = f"{config["campaign"]["name"]} RF{flight:02} {config["flights"][flight]["date"]}: Calibrated raw data"
+    title = f"{config['campaign']['name']} RF{flight:02} {config['flights'][flight]['date']}: Calibrated raw data"
     ds.attrs["title"] = title
     return ds
 
@@ -372,7 +372,7 @@ def get_global_attributes(ds, config, instrument, flight):
     try:
         attributes = config["instrument_metadata"][instrument]
         ds.attrs = attributes
-        ds.attrs["title"] = attributes["title"] + f"RF{flight:02} ({str(config["flights"][flight]["date"])})"
+        ds.attrs["title"] = attributes["title"] + f"RF{flight:02} ({str(config['flights'][flight]['date'])})"
         ds.attrs["campaign"] = config["campaign"]["name"]
         ds.attrs["platform"] = config["campaign"]["platform"]
         return ds
