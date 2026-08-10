@@ -103,7 +103,7 @@ def run(args):
     elif pf == "tbird":
         start = np.datetime64(config["flights"][flight]["start_tbird"])
         stop = np.datetime64(config["flights"][flight]["stop_tbird"])
-    h.add2logfile(logfile, f"{dev_name}: {config["campaign"]["name"]}, flight {flight}, {flight_date}")
+    h.add2logfile(logfile, f"{dev_name}: {config['campaign']['name']}, flight {flight}, {flight_date}")
 
     try:
         time_offset = config["flights"][flight]["time_offsets"][dev_name]

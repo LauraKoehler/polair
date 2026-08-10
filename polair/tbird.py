@@ -68,7 +68,7 @@ def run(args):
     fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_tbird_100Hz.nc"
     start = config["flights"][flight]["start_tbird"]
     stop = config["flights"][flight]["stop_tbird"]
-    h.add2logfile(logfile, f"T-Bird: {config["campaign"]["name"]}, flight {flight}, {flight_date}")
+    h.add2logfile(logfile, f"T-Bird: {config['campaign']['name']}, flight {flight}, {flight_date}")
 
     data = xr.open_dataset(fn_in)
 
