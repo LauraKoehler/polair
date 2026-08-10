@@ -695,7 +695,7 @@ def get_radiation(config, flight, out_vars):
     Returns:
         xarray.Dataset: Dataset with longwave and shortwave radiation
     """
-    fn_prefix = f"{config["flights"][flight]["data_dir"]}/{config["flights"][flight]["prefix"]}"
+    fn_prefix = f"{config['flights'][flight]['data_dir']}/{config['flights'][flight]['prefix']}"
     vars = list(reversed(np.sort(list(out_vars.keys()))))
 
     for v in vars:

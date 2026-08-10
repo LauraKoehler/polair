@@ -226,7 +226,7 @@ def find_gaps(df, v, var_dict, logfile, gap_factor=2.0):
     if len(gaps_df) > 0:
         add2logfile(logfile, f"{v}: gaps")
         for i in np.arange(len(gaps_df)):
-            add2logfile(logfile, f"{i}: period: {gaps_df.iloc[0]["start_time"]} - {gaps_df.iloc[0]["end_time"]}, duration: {gaps_df.iloc[0]["gap_duration_s"]} s")
+            add2logfile(logfile, f"{i}: period: {gaps_df.iloc[0]['start_time']} - {gaps_df.iloc[0]['end_time']}, duration: {gaps_df.iloc[0]['gap_duration_s']} s")
 
     return gaps_df
 
