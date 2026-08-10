@@ -64,12 +64,12 @@ def run(args):
     logfile = h.create_logfile(config)
     vars = h.import_dictionary(config["paths"]["variables"])
     cal_file = h.import_dictionary(config["paths"]["calibration"])
-    fn_prefix = f"{config["flights"][flight]["data_dir"]}/{config["flights"][flight]["prefix"]}"
+    fn_prefix = f"{config['flights'][flight]['data_dir']}/{config['flights'][flight]['prefix']}"
     outdir = config["paths"]["outdirs"]["raw"]
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
     fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
-    h.add2logfile(logfile, f"Preprocessing: {config["campaign"]["name"]}, flight {flight}, {flight_date}")
+    h.add2logfile(logfile, f"Preprocessing: {config['campaign']['name']}, flight {flight}, {flight_date}")
     
     # Calibration of the raw data and interpolation to 100 Hz
     var_list = list(vars.keys())
@@ -80,7 +80,7 @@ def run(args):
         ]
     for v in var_list:
         old_name = vars[v]["old"]
-        fn = f"{config["flights"][flight]["data_dir"]}/{config["flights"][flight]["prefix"]}{old_name}.dat"
+        fn = f"{config['flights'][flight]['data_dir']}/{config['flights'][flight]['prefix']}{old_name}.dat"
         df = pd.read_csv(fn, header  = 4, sep = r'\s+', names = ["date", "time", f"{v}"])
         df = h.get_timestamps(df)
         df = calibration.cal(v,cal_file,df, fn_prefix, vars)
