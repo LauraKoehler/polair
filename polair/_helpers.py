@@ -375,6 +375,9 @@ def get_global_attributes(ds, config, instrument, flight):
         ds.attrs["title"] = attributes["title"] + f"RF{flight:02} ({str(config['flights'][flight]['date'])})"
         ds.attrs["campaign"] = config["campaign"]["name"]
         ds.attrs["platform"] = config["campaign"]["platform"]
+        if not "date" in attributes.keys():
+            today = datetime.today().strftime('%Y-%m-%d')
+            ds.attrs["date"] = today
         return ds
     except:
         print("No instrument metadata in config file")
