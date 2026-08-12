@@ -1,10 +1,14 @@
-cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+abstract: 'polair: polar aircraft data processing and standardisation'
 authors:
 - family-names: "Köhler"
-  given-names: "Laura"
-title: "polair"
-repository-code: "https://github.com/LauraKoehler/polair.git"
-abstract: "polair: polar aircraft data processing and standardisation"
-version: 1.0.0
-date-released: '2025-12-01'
+  given-names: Laura
+cff-version: 1.2.0
+date-released: '2026-07-30'
+doi: 10.5281/zenodo.21703863
+license:
+- bsd-3-clause
+message: If you use this software, please cite it using the metadata from this file.
+repository-code: https://github.com/LauraKoehler/polair/tree/v1.0.4
+title: polair
+type: software
+version: v1.0.4
