@@ -236,7 +236,7 @@ def correct_ttrk_ins_with_gps(data, data_corr, v):
     return corrected
 
 
-def alignement_correction(data, fhp_params, platform, twist_angle):
+def alignement_correction(data, fhp_params, v, platform, twist_angle):
     """
     Apply alignment corrections from mounting of the noseboom/t-bird.
 
@@ -247,6 +247,8 @@ def alignement_correction(data, fhp_params, platform, twist_angle):
             100 Hz calibrated data
         fhp_params: dict
             Dictionary with parameters for the five-hole probes
+        v: str
+            Variable to calibrate (options: "qb", "qc", "ps", "alpha", "beta")
         platform: str
             "noseboom" or "tbird"
         twist_angle: float
@@ -255,11 +257,11 @@ def alignement_correction(data, fhp_params, platform, twist_angle):
     Returns:
         xarray.DataArray: Dataset with corrected values
     """
-    a0 = fhp_params[platform]["a0"]
-    a1_qb = fhp_params[platform]["a1_qb"]
-    a1_qc = fhp_params[platform]["a1_qc"]
-    a1_ps = fhp_params[platform]["a1_ps"]
-    a1_qratio = fhp_params[platform]["a1_qratio"]
+    a0 = fhp_params[platform][v]["a0"]
+    a1_qb = fhp_params[platform][v]["a1_qb"]
+    a1_qc = fhp_params[platform][v]["a1_qc"]
+    a1_ps = fhp_params[platform][v]["a1_ps"]
+    a1_qratio = fhp_params[platform][v]["a1_qratio"]
 
     if platform == "noseboom":
         if v in ["qc", "ps"]:
@@ -517,7 +519,8 @@ def get_wind_component(data, data_corr, component, platform):
         vrzf = c2 * phi_rate - c3 * theta_rate
         vns = data["gs_inat"] * np.cos(ttrk)
         vew = data["gs_inat"] * np.sin(ttrk)
-        vup = data["h_inat"].rolling(time=100, center=True).mean().diff("time")/0.01
+        h_inat = data["h_inat"].where(np.abs(data["h_inat"].diff("time")) < 1.5)
+        vup = h_inat.rolling(time=100, center=True).mean().diff("time")/0.01
 
     # Calculate ground-relative wind components
     uKg = (vew
@@ -749,4 +752,57 @@ def stp_conditions(ds, temp="t_amb", pres="p_amb"):
             ds[f"{v}_stp"] = stp_corr
             if v == "number_conc":
                 ds[f"{v}_stp"].attrs = stp_vars[v]
+    return ds
+
+def mask_licor_peaks(da, dim="time", threshold=10, on="diff"):
+    """
+    Flag outliers in an xarray DataArray using a robust (MAD-based) z-score.
+
+    Args:
+        da: xarray.DataArray
+            input data array
+        dim: str
+            the dimension to diff/threshold along (your time dimension)
+        threshold: float
+            used threshold to detect peaks
+        on : str
+            "diff" to flag sudden jumps (single-point spikes),
+             "value" to flag the signal itself (level shifts / bad values)
+             
+    Returns:
+        xarray.DataArray: DataArray with the mask for peaks
+    """
+    extra_coords = [c for c in da.coords if c != dim]
+    da = da.drop_vars(extra_coords)
+
+    x = da.diff(dim) if on == "diff" else da
+
+    med = x.median()
+    mad = (np.abs(x - med)).median()
+    if float(mad) == 0:
+        return xr.zeros_like(da, dtype=bool)
+
+    z = 0.6745 * (x - med) / mad
+    mask = np.abs(z) > threshold
+
+    if on == "diff":
+        mask = mask.reindex({dim: da[dim]}, fill_value=False)
+    return mask
+
+def mask_out_licor_peaks(ds, out_vars):
+    """
+    Masking out peaks in the licor data
+
+    Args:
+        ds: xr.Dataset
+            input data set from LICOR
+        out_vars: dict
+            variable dictionary
+
+    Returns:
+        xarray.Dataset: Dataset with peaks masked out
+    """
+    for v in out_vars.keys():
+        mask = mask_licor_peaks(ds[v])
+        ds = ds.where(~mask)
     return ds

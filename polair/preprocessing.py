@@ -98,6 +98,5 @@ def run(args):
         if str(vars[v]["units_old"])[:4] == "9.81":
             data_100Hz[v] = g_ratio * data_100Hz[v]
         data_100Hz = h.add_attrs_var(data_100Hz, v, vars)
-
     data_100Hz = h.add_global_attrs(data_100Hz, config, flight)
     data_100Hz.to_netcdf(fn_out)

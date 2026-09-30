@@ -19,6 +19,7 @@ from pathlib import Path
 from datetime import datetime
 import pint_xarray
 import os
+import glob
 
 def import_dictionary(yaml_file):
     """
@@ -418,6 +419,83 @@ def add_segment_coordinate(ds, config, flight):
         print("No segment file available")
         return ds
 
+def read_uhsas(path, name_row=0, encoding="latin-1", date_format="%m/%d/%Y"):
+    """
+    Reading in UHSAS data.
+    Returns a DataFrame indexed by timestamp (from the date + time columns).
+    The ms-since-midnight column is kept as 'ms_since_midnight' for checking.
+
+    Args:
+        path: str
+            data path
+        name_row : int
+            which of the two header lines holds the column names (0 or 1).
+            The other line is stored in df.attrs["header_other"].
+        encoding: str
+            Encoding type for reading the file, default is latin-1.
+        date_format : str
+            strptime format of the date column ("%m/%d/%Y" -> 1/21/2026).
+            Default is "%m/%d/%Y"
+
+    Returns:
+        pandas.DataFrame: imported UHSAS data
+    """
+   # --- header lines ---------------------------------------------------
+    with open(path, "r", encoding=encoding, errors="replace") as f:
+        headers = [next(f).rstrip("\r\n").split("\t") for _ in range(2)]
+    names = [h.strip() for h in headers[name_row]]
+    other = [h.strip() for h in headers[1 - name_row]]
+
+    # --- data: read everything as text first ----------------------------
+    n_cols = len(names) + 2
+    raw = pd.read_csv(
+        path, sep="\t", header=None, skiprows=2, names=range(n_cols),
+        encoding=encoding, engine="python", dtype=str,
+    )
+    raw = raw.dropna(how="all")
+
+    # --- unique column names --------------------------------------------
+    names = names + ["Total_counts", "seconds_since_midnight"]
+    seen, unique = {}, []
+    for n in names:
+        n = n or "unnamed"
+        if n in seen:
+            seen[n] += 1
+            n = f"{n}_{seen[n]}"
+        else:
+            seen[n] = 0
+        unique.append(n)
+    raw.columns = unique
+
+    # --- timestamp from first two columns -------------------------------
+    # Time looks like '12:00:35.83  PM' (AM/PM, sometimes double spaces)
+    squeeze = lambda s: s.str.replace(r"\s+", " ", regex=True).str.strip()
+    date_s = squeeze(raw.iloc[:, 0])
+    time_s = squeeze(raw.iloc[:, 1]).str.upper()
+    timestamp = pd.to_datetime(
+        date_s + " " + time_s,
+        format=date_format + " %I:%M:%S.%f %p",
+        errors="coerce",
+    )
+
+    # --- numeric data: everything except date/time ----------------------
+    df = raw.iloc[:, 2:].apply(pd.to_numeric, errors="coerce")
+    df.index = pd.DatetimeIndex(timestamp, name="time")
+
+    # drop rows where the timestamp couldn't be parsed
+    bad = df.index.isna().sum()
+    if bad:
+        print(f"Warning: {bad} rows with unparsable date/time were dropped")
+        df = df[~df.index.isna()]
+
+    # --- time as a normal first column, row number as index -------------
+    df = df.reset_index()          # 'time' becomes column 0, index = 0..n-1
+    df.index.name = "row"
+
+    df.attrs["header_other"] = dict(zip(unique[2:-2], other[2:]))
+    df.attrs["source"] = path
+    return df
+
 def import_device_data(indir, dev, time_offset):
     """
     Import data from different devices.
@@ -441,6 +519,9 @@ def import_device_data(indir, dev, time_offset):
         files = np.sort([f for f in os.listdir(indir) if f.endswith('.dat')])
     elif dev == "kt19":
         files = np.sort([f for f in os.listdir(indir) if f.endswith('KT19serial.ERR.dat')])
+    elif dev == "uhsas":
+        files = np.sort([f for f in os.listdir(indir) if f.endswith('.xls')])
+        files = files[~np.char.endswith(files, "PBP.xls")]
 
     for fn in files:
         if dev == "mcpc":
@@ -464,6 +545,9 @@ def import_device_data(indir, dev, time_offset):
             df = pd.read_csv(f"{indir}/{fn}", header  = 4, sep = r'\s+', names = ["date", "times", "KT19 Serial", "unit"])
             times = pd.to_datetime(df["date"].values+"T"+df["times"].values)
             df["time"] = times - np.timedelta64(time_offset, "ms")
+        elif dev == "uhsas":
+            df = read_uhsas(f"{indir}/{fn}")
+            df["time"] = df["time"] - np.timedelta64(time_offset, "ms")
         try:
             df_all = pd.concat([df_all, df], ignore_index = True)
         except:
@@ -512,3 +596,32 @@ def import_radiation_data(fn, name):
     data["time"] = times
     ds = data.set_index("time").to_xarray()
     return ds
+
+def import_licor(out_vars, indir):
+    """
+    Import of DMS LI-COR data.
+
+    Args:
+        out_vars: dict
+            variable dictionary
+        indir: str
+            input directory
+
+    Returns:
+        xarray.Dataset: data set with LI-COR data
+    """
+    for v in out_vars.keys():
+        old_name = out_vars[v]["old"]
+        fn = glob.glob(f"{indir}/*{old_name}.dat")[0]
+        data = pd.read_csv(fn, header  = 4, sep = r'\s+', names = ["date", "times", old_name])
+        times = pd.to_datetime(data["date"].values+"T"+data["times"].values)
+        data["time"] = times
+        ds = data.set_index("time").to_xarray()
+        # Remove non-unique time stamps which occurred once during BACSAM II:
+        _, idx = np.unique(ds["time"].values, return_index=True)
+        ds = ds.isel({"time": idx})
+        try:
+            out = xr.merge([out, ds])
+        except:
+            out = ds
+    return out

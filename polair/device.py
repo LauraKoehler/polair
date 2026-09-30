@@ -49,7 +49,7 @@ def configure_device_parser(parser):
     parser.add_argument(
         "-i",
         "--instrument",
-        help="instrument to be processed, options are mcpc, partector, partector_dms, kt19, radiation",
+        help="instrument to be processed, options are mcpc, partector, partector_dms, kt19, radiation, uhsas, licor",
         default=None,
         required=True,
     )
@@ -113,6 +113,8 @@ def run(args):
 
     if dev == "radiation":
         ds = corr.get_radiation(config, flight, out_vars)
+    elif dev in ["licor", "licor_tb"]:
+        ds = h.import_licor(out_vars, indir)
     else:
         ds = h.import_device_data(indir, dev, time_offset)
     # Resampling to 1 sec time resolution is only done if resample = True. Otherwise, the original time stamps are kept.
@@ -157,9 +159,14 @@ def run(args):
     if dev in ["mcpc", "partector"]:
         # Cut first and last 2 minutes since there are often very high counts due to the own emissions
         out_ds = out_ds.sel(time = slice(start + np.timedelta64(2,"m"), stop - np.timedelta64(2,"m")))
-    if dev in ["mcpc", "partector", "partector_dms"]:
+    if dev in ["uhsas"]:
+        # Cut first 5 and last 2 minutes since the UHSAS needs some time at the beginning.
+        out_ds = out_ds.sel(time = slice(start + np.timedelta64(5,"m"), stop - np.timedelta64(2,"m")))
+    if dev in ["mcpc", "partector", "partector_dms", "uhsas"]:
         out_ds = corr.mask_out_peaks(out_ds)
         out_ds = corr.check_flow(out_ds)
+    if dev in ["licor"]:
+        out_ds = corr.mask_out_licor_peaks(out_ds, out_vars)
 
     out_ds = h.get_global_attributes(out_ds, config, dev_name, flight)
     out_ds = h.add_segment_coordinate(out_ds, config, flight)
