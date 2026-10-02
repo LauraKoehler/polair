@@ -92,7 +92,13 @@ def run(args):
     if dev in ["kt19", "radiation"]:
         indir = config["flights"][flight]["data_dir"]
     else:
-        indir = config["flights"][flight][dev_name]
+        try:
+            indir = config["flights"][flight][dev_name]
+        except KeyError:
+            try:
+                indir = f"{config['flights'][flight]['flight_dir']}/{dev_pf}"
+            except KeyError:
+                print("input directory not found")
     outdir = config["paths"]["outdirs"][dev_name]
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]

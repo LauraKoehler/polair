@@ -754,7 +754,7 @@ def stp_conditions(ds, temp="t_amb", pres="p_amb"):
                 ds[f"{v}_stp"].attrs = stp_vars[v]
     return ds
 
-def mask_licor_peaks(da, dim="time", threshold=10, on="diff"):
+def mask_jumps(da, dim="time", threshold=10, on="diff"):
     """
     Flag outliers in an xarray DataArray using a robust (MAD-based) z-score.
 
@@ -803,6 +803,24 @@ def mask_out_licor_peaks(ds, out_vars):
         xarray.Dataset: Dataset with peaks masked out
     """
     for v in out_vars.keys():
-        mask = mask_licor_peaks(ds[v])
+        mask = mask_jumps(ds[v])
         ds = ds.where(~mask)
+    return ds
+
+def mask_out_dropsonde_peaks(ds, out_vars):
+    """
+    Masking out peaks in the licor data
+
+    Args:
+        ds: xr.Dataset
+            input data set from LICOR
+        out_vars: dict
+            variable dictionary
+
+    Returns:
+        xarray.Dataset: Dataset with peaks masked out
+    """
+    for v in out_vars.keys():
+        mask = mask_jumps(ds[v], dim="index")
+        ds[v] = ds[v].where(~mask)
     return ds

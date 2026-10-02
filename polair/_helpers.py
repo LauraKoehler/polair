@@ -384,6 +384,34 @@ def get_global_attributes(ds, config, instrument, flight):
         print("No instrument metadata in config file")
         return ds
 
+def get_global_attributes_without_flight(ds, config, instrument):
+    """
+    Assigns attributes to the data set according to the config file.
+
+    Args:
+        ds: xarray.Dataset
+            data set which should get attributes
+        config: dict
+            configuration dictionary
+        instrument: str
+            instrument as called in the condig file
+
+    Returns:
+        xarray.Dataset: data set with attributes.
+    """
+    try:
+        attributes = config["instrument_metadata"][instrument]
+        ds.attrs = attributes
+        ds.attrs["campaign"] = config["campaign"]["name"]
+        ds.attrs["platform"] = config["campaign"]["platform"]
+        if not "date" in attributes.keys():
+            today = datetime.today().strftime('%Y-%m-%d')
+            ds.attrs["date"] = today
+        return ds
+    except:
+        print("No instrument metadata in config file")
+        return ds
+
 def add_segment_coordinate(ds, config, flight):
     """
     Assigns segment coordinate to a data set.
@@ -624,4 +652,65 @@ def import_licor(out_vars, indir):
             out = xr.merge([out, ds])
         except:
             out = ds
+    return out
+
+def import_dropsondes(config):
+    """
+    Import all dropsonde files from the campaign and combine them to one data set.
+
+    Args:
+        config: dict
+            Campaign config dictionary
+
+    Returns:
+        xarray.Dataset: dataset with all dropsondes from the campaign.
+    """
+    out = None
+    num = 0
+    
+    for f in list(config["flights"].keys()):
+        start = np.datetime64(config["flights"][f]["start"])
+        stop = np.datetime64(config["flights"][f]["stop"])
+        try:
+            indir = f"{config["flights"][f]["flight_dir"]}/dropsondes"
+            sonde_dirs = np.sort(os.listdir(indir))
+            sonde_dirs = [f for f in sonde_dirs if not f.startswith(".")]
+            for sd in sonde_dirs:
+                try:
+                    fn = glob.glob(f"{indir}/{sd}/C*.csv")[0]
+                    date_str = glob.glob(f"{indir}/{sd}/C*.csv")[0][-21:-6]
+                    launch_time = pd.to_datetime(date_str, format="%Y%m%d_%H%M%S").to_datetime64()
+                    if not (start <= launch_time <= stop):
+                        print(f"{f},{sd}: launch_time {launch_time} not in flight period "
+                              f"({start} - {stop})")
+                        continue
+                    # Import data
+                    df = pd.read_csv(fn, header = 8, sep = ",", on_bad_lines="skip")
+                    times = pd.to_datetime(df["Data Date & Time (UTC)"])
+                    ds = df.to_xarray()
+                    ds = ds.assign_coords({"time": (["index"], times)})
+                    ds = ds.sortby("time")
+                    ds = ds.where(ds.time > launch_time, drop=True)
+                    ds = ds.swap_dims({"index": "time"})
+                    # Get landing time
+                    near_zero = np.abs(ds["GPS Vert Velocity (m/s)"]) < 0.1
+                    window = 10  
+                    rolling_ok = near_zero.rolling(time=window).sum() == window
+                    landing_idx = rolling_ok.argmax().item()  
+                    landing_time = ds.time.isel(time=landing_idx - window).values
+                    # Prepare data set
+                    ds = ds.sel(time = slice(launch_time, landing_time))
+                    ds = ds.where(ds["RSS421 Pressure (mb)"] > -998, drop = True)
+                    seconds_since_launch = (((ds.time - np.datetime64(launch_time)).values).astype("float"))/10**9
+                    ds = ds.assign_coords({"sec_since_launch": (["time"], seconds_since_launch)})
+                    idx = np.arange(len(ds.time))
+                    num = num + 1
+                    ds = ds.assign_coords({"number": [num], "index": (["time"], idx)})
+                    ds = ds.assign_coords({"flight": (["number"], [f]), "launch_time": (["number"], [ds.time.values[0]])})
+                    ds = ds.swap_dims({"time": "index"})
+                    out = ds if out is None else xr.concat([out, ds], dim="number")
+                except:
+                    print(f"{f},{sd}: no complete sounding")
+        except:
+            print(f"No dropsondes during flight {f}")
     return out
