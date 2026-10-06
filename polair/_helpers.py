@@ -672,7 +672,7 @@ def import_dropsondes(config):
         start = np.datetime64(config["flights"][f]["start"])
         stop = np.datetime64(config["flights"][f]["stop"])
         try:
-            indir = f"{config["flights"][f]["flight_dir"]}/dropsondes"
+            indir = f"{config['flights'][f]['flight_dir']}/dropsondes"
             sonde_dirs = np.sort(os.listdir(indir))
             sonde_dirs = [f for f in sonde_dirs if not f.startswith(".")]
             for sd in sonde_dirs:
