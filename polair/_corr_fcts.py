@@ -592,7 +592,7 @@ def mask_out_peaks(ds, refvar="p_amb", threshold=5000, timedelta=1):
     ds = ds.where(mask)
     return ds
 
-def check_flow(ds, refvar="flow_rate", variance=0.1):
+def check_flow(ds, refvar="flow_rate", variance=0.1, p_dep = False):
     """
     Remove flow anomalies where flow rate varies more than specified percentage from average.
 
@@ -607,8 +607,12 @@ def check_flow(ds, refvar="flow_rate", variance=0.1):
     Returns:
         xarray.Dataset: Data with flow anomalies removed
     """
-    mean = ds[refvar].mean()
-    mask = np.abs(ds[refvar] - mean) < variance * mean
+    if p_dep:
+        mean = (ds[refvar]/ds["p_amb"]).mean()
+        mask = np.abs((ds[refvar]/ds["p_amb"]) - mean) < variance * mean
+    else:
+        mean = ds[refvar].mean()
+        mask = np.abs(ds[refvar] - mean) < variance * mean
     structure = np.ones(11)
     mask = xr.DataArray(
         ~binary_dilation(~mask.values, structure=structure),
@@ -789,7 +793,7 @@ def mask_jumps(da, dim="time", threshold=10, on="diff"):
         mask = mask.reindex({dim: da[dim]}, fill_value=False)
     return mask
 
-def mask_out_licor_peaks(ds, out_vars):
+def mask_out_jumps(ds, out_vars):
     """
     Masking out peaks in the licor data
 
@@ -823,4 +827,8 @@ def mask_out_dropsonde_peaks(ds, out_vars):
     for v in out_vars.keys():
         mask = mask_jumps(ds[v], dim="index")
         ds[v] = ds[v].where(~mask)
+    return ds
+
+def mask_out_data_gaps(ds, var):
+    ds = ds.where(ds[var] > 0)
     return ds

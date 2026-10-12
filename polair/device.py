@@ -123,8 +123,6 @@ def run(args):
         ds = h.import_licor(out_vars, indir)
     else:
         ds = h.import_device_data(indir, dev, time_offset)
-    # Resampling to 1 sec time resolution is only done if resample = True. Otherwise, the original time stamps are kept.
-    ds = h.resample2sec(ds, resample = False)
 
     var_list = list(out_vars.keys())
     
@@ -140,6 +138,14 @@ def run(args):
     
         out_ds[v].attrs = {}
         out_ds = h.add_attrs_var(out_ds, v, out_vars)
+        
+    # Resampling to 1 sec time resolution is only done if instrument listed in config file to resample. Otherwise, the original time stamps are kept.
+    try: 
+        toresample = config["campaign"]["resampling"]
+    except:
+        toresample = []
+    if dev in toresample:
+        out_ds = h.resample2sec(out_ds, dev)
 
     try:
         if pf == "polar6":
@@ -161,18 +167,30 @@ def run(args):
     devs4stp = config["campaign"]["stp"]
     if dev in devs4stp:
         out_ds = corr.stp_conditions(out_ds)
+
+    try:
+        dev_cuts = config["campaign"]["dev_cut_sec"]
+    except:
+        dev_cuts = {}
+    if dev in list(dev_cuts.keys()):
+        cut_start = dev_cuts[dev]["start"]
+        cut_stop = dev_cuts[dev]["stop"]
+        out_ds = out_ds.sel(time = slice(start + np.timedelta64(cut_start,"s"), stop - np.timedelta64(cut_stop,"s")))
     
-    if dev in ["mcpc", "partector"]:
-        # Cut first and last 2 minutes since there are often very high counts due to the own emissions
-        out_ds = out_ds.sel(time = slice(start + np.timedelta64(2,"m"), stop - np.timedelta64(2,"m")))
     if dev in ["uhsas"]:
-        # Cut first 5 and last 2 minutes since the UHSAS needs some time at the beginning.
-        out_ds = out_ds.sel(time = slice(start + np.timedelta64(5,"m"), stop - np.timedelta64(2,"m")))
+        out_ds = corr.mask_out_data_gaps(out_ds, "total_counts")
     if dev in ["mcpc", "partector", "partector_dms", "uhsas"]:
         out_ds = corr.mask_out_peaks(out_ds)
-        out_ds = corr.check_flow(out_ds)
-    if dev in ["licor"]:
-        out_ds = corr.mask_out_licor_peaks(out_ds, out_vars)
+        try: 
+            p_dep_devices = config["campaign"]["flow_p_dep"]
+        except:
+            p_dep_devices = []
+        if dev in p_dep_devices:
+            out_ds = corr.check_flow(out_ds, p_dep = True)
+        else:
+            out_ds = corr.check_flow(out_ds, p_dep = False)
+    if dev in ["licor", "mcpc"]:
+        out_ds = corr.mask_out_jumps(out_ds, out_vars)
 
     out_ds = h.get_global_attributes(out_ds, config, dev_name, flight)
     out_ds = h.add_segment_coordinate(out_ds, config, flight)

@@ -585,7 +585,7 @@ def import_device_data(indir, dev, time_offset):
     ds = df_all.to_xarray()
     return ds
 
-def resample2sec(ds, resample, freq = "1s"):
+def resample2sec(ds, dev, freq = "1s"):
     """
     Resample data to 1s (default) temporal resolution.
 
@@ -602,7 +602,15 @@ def resample2sec(ds, resample, freq = "1s"):
     Returns:
         xarray.Dataset: resampled dataset if sampling is put to True. Else ds is not changed
     """
-    if resample:
+    if dev == "uhsas":
+        mean_vars  = ["p_amb", "flow_rate"]
+        sum_vars = [v for v in ds.data_vars if v not in mean_vars]
+        res = xr.merge([
+            ds[sum_vars].resample(time="1s").sum(skipna=True),
+            ds[mean_vars].resample(time="1s").mean(skipna=True),
+        ])
+        ds = res
+    else:
         ds = ds.resample(time = freq).nearest()
     return ds
 
