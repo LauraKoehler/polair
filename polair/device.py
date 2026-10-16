@@ -100,6 +100,7 @@ def run(args):
             except KeyError:
                 print("input directory not found")
     outdir = config["paths"]["outdirs"][dev_name]
+    os.makedirs(outdir, exist_ok=True)
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
     fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_{dev_name}.nc"
