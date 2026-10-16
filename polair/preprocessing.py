@@ -24,8 +24,8 @@ The location needs to be specified in the configuration file of the campaign.
 """
 
 from . import _helpers as h
-from . import _calibration as calibration 
-import numpy as np
+from . import _calibration as calibration
+import os
 import xarray as xr
 import pandas as pd
 
@@ -66,6 +66,7 @@ def run(args):
     cal_file = h.import_dictionary(config["paths"]["calibration"])
     fn_prefix = f"{config['flights'][flight]['data_dir']}/{config['flights'][flight]['prefix']}"
     outdir = config["paths"]["outdirs"]["raw"]
+    os.makedirs(outdir, exist_ok=True)
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
     fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
@@ -78,6 +79,7 @@ def run(args):
             v for v in var_list
             if vars[v]["group"] not in ["tbird", "inat"]
         ]
+    df_list = list()
     for v in var_list:
         old_name = vars[v]["old"]
         fn = f"{config['flights'][flight]['data_dir']}/{config['flights'][flight]['prefix']}{old_name}.dat"
@@ -88,11 +90,9 @@ def run(args):
         h.find_gaps(df, v, vars, logfile)
         ds = h.interpolate_time(df, v, vars)
         ds = h.convert_unit(ds, vars, v)
-        try:
-            data_100Hz = xr.merge([data_100Hz, ds])
-        except:
-            data_100Hz = ds
+        df_list.append(ds)
 
+    data_100Hz = xr.merge(df_list, join='outer', compat='no_conflicts')
     g_ratio = h.g_welmec(data_100Hz.lat_gprmc, data_100Hz.h_gpgga)/9.81
     for v in var_list:
         if str(vars[v]["units_old"])[:4] == "9.81":
