@@ -646,6 +646,7 @@ def import_licor(out_vars, indir):
     Returns:
         xarray.Dataset: data set with LI-COR data
     """
+    datasets = list()
     for v in out_vars.keys():
         old_name = out_vars[v]["old"]
         fn = glob.glob(f"{indir}/*{old_name}.dat")[0]
@@ -656,11 +657,9 @@ def import_licor(out_vars, indir):
         # Remove non-unique time stamps which occurred once during BACSAM II:
         _, idx = np.unique(ds["time"].values, return_index=True)
         ds = ds.isel({"time": idx})
-        try:
-            out = xr.merge([out, ds])
-        except:
-            out = ds
-    return out
+        datasets.append(ds)
+
+    return xr.merge(datasets, join='outer', compat='no_conflicts')
 
 def import_dropsondes(config):
     """
