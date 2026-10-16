@@ -20,10 +20,11 @@ Adiabatic corrections are used and the wind components are determined.
 """
 
 from . import _helpers as h
-from . import _corr_fcts as corr 
+from . import _corr_fcts as corr
+import os
 import numpy as np
 import xarray as xr
-import pandas as pd
+
 
 def configure_noseboom_parser(parser):
     parser.add_argument(
@@ -62,6 +63,7 @@ def run(args):
     fhp_params = h.import_dictionary(config["paths"]["fiveholeprobe"])
     indir = config["paths"]["outdirs"]["raw"]
     outdir = config["paths"]["outdirs"]["noseboom"]
+    os.makedirs(outdir, exist_ok=True)
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
     fn_in = indir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
@@ -108,14 +110,14 @@ def run(args):
     # Correction of INS with GPS
     w_ins = corr.get_w_ins(data, start, stop)
     h_ins = corr.get_h_ins(w_ins["w_ins"])
-    data = xr.merge([data, w_ins, h_ins])
+    data = xr.merge([data, w_ins, h_ins], join='outer', compat='no_conflicts')
     
     for v in ["lat", "lon", "gs", "h_ins", "w_ins", "vew", "vns"]:
         gps_corr = corr.correct_ins_with_gps(data, v)
-        data_corr = xr.merge([data_corr, gps_corr])
+        data_corr = xr.merge([data_corr, gps_corr], join='outer', compat='no_conflicts')
 
     ttrk_corr = corr.correct_ttrk_ins_with_gps(data, data_corr, "ttrk")
-    data_corr = xr.merge([data_corr, ttrk_corr])
+    data_corr = xr.merge([data_corr, ttrk_corr], join='outer', compat='no_conflicts')
 
     # Calculate true airspeed
     data_corr["tas"] = corr.get_true_air_speed(data_corr, pf)
@@ -128,6 +130,7 @@ def run(args):
     # Cleaning up and prepare the output dataset
     out_vars = out_vars[pf]
     var_list = list(out_vars.keys())
+    ds_list = list()
     for v in var_list:
         v_old = out_vars[v]["old"]
         if out_vars[v]["platform"] in ["noseboom"]:
@@ -136,13 +139,11 @@ def run(args):
             except:
                 var_data = data_corr[[v_old]]
             var_data = var_data.sel(time = slice(start,stop)).rename({v_old: v})
-            try:
-                out_ds = xr.merge([out_ds, var_data])
-            except:
-                out_ds = var_data
-            out_ds[v].attrs = {}
-            out_ds = h.add_attrs_var(out_ds, v, out_vars)
+            var_data[v].attrs = {}
+            var_data = h.add_attrs_var(var_data, v, out_vars)
+            ds_list.append(var_data)
 
+    out_ds = xr.merge(ds_list, join='outer', compat='no_conflicts')
     out_ds = h.get_global_attributes(out_ds, config, pf, flight)
     out_ds = h.add_segment_coordinate(out_ds, config, flight)
 
