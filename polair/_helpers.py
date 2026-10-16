@@ -266,7 +266,8 @@ def interpolate_time(df, v, var_dict, steps = 0.01):
 
 def add_attrs_var(ds, v, var_dict):
     """
-    This function adds all attributes from the variable dictrionary except for the old name which is only necessary to read in the correct file.
+    This function adds all attributes from the variable dictionary except for
+    the old name which is only necessary to read in the correct file.
 
     It adds the original unit because no unit conversion is done so far.
 
