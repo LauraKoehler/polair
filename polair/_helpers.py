@@ -551,6 +551,7 @@ def import_device_data(indir, dev, time_offset):
         files = np.sort([f for f in os.listdir(indir) if f.endswith('.xls')])
         files = files[~np.char.endswith(files, "PBP.xls")]
 
+    df_list = list()
     for fn in files:
         if dev == "mcpc":
             df = pd.read_csv(f"{indir}/{fn}", header = 13, sep = "\t")
@@ -576,11 +577,11 @@ def import_device_data(indir, dev, time_offset):
         elif dev == "uhsas":
             df = read_uhsas(f"{indir}/{fn}")
             df["time"] = df["time"] - np.timedelta64(time_offset, "ms")
-        try:
-            df_all = pd.concat([df_all, df], ignore_index = True)
-        except:
-            df_all = df
-    df_all = df_all.sort_values(by = "time").set_index("time")
+
+        df_list.append(df)
+
+    df_all = pd.concat(df_list, ignore_index=True)
+    df_all = df_all.sort_values(by="time").set_index("time")
     df_all = df_all[~df_all.index.duplicated(keep='last')]
     ds = df_all.to_xarray()
     return ds
