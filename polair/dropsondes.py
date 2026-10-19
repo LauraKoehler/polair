@@ -16,7 +16,9 @@ The dropsonde command processes dropsonde data for the entire campaign.
 
     polair dropsondes -c <config file>
 
+Required is the path to the config file. 
 
+To use the dropsonde command, the dropsondes data for each flight have to be in flight_dir/dropsondes, where flight_dir has to be specified in the config file for each flight. In this directory, each dropsonde has an own subfolder.
 """
 
 from . import _helpers as h

@@ -12,6 +12,12 @@ device
 .. automodule:: polair.device
    :members:
 
+dropsondes
+^^^^^^
+
+.. automodule:: polair.dropsondes
+   :members:
+
 noseboom
 ^^^^^^^^
 

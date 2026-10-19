@@ -589,7 +589,9 @@ def resample2sec(ds, dev, freq = "1s"):
     """
     Resample data to 1s (default) temporal resolution.
 
-    e.g. if timestamps from DMS. Used method is 'nearest'. This function is optional and not used per default.
+    E.g. if timestamps from DMS or the frequency settings in the instrument were wrong. 
+    Used method is 'nearest' except for dev = "uhsas", where 'mean' is used for pressure and flow_rate and 'sum' for all other varibles, which are all counts.
+    This function is optional and not used per default.
 
     Args:
         ds: xarray.Dataset

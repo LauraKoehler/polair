@@ -17,7 +17,8 @@ The device command processes data from other instruments than noseboom and t-bir
     polair device -f <flight number> -c <config file> -i <instrument>  -p <platform>
 
 
-Options for instruments are mcpc, partector, partector_dms, kt19, and radiation.
+Required are the flight number, the path to the config file, and the instrument to be processed. Options for instruments are mcpc, partector, partector_dms, uhsas, kt19, radiation, and licor.
+
 Platform `p` is optional with default being `polar6`, add if platform is `tbird`.
 
 

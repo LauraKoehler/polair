@@ -20,7 +20,7 @@ The location needs to be specified in the configuration file of the campaign.
 
     polair preprocessing -f <flight number> -c <config file>
 
-
+The path to the config file and the flight number are required.
 """
 
 from . import _helpers as h

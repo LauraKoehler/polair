@@ -603,6 +603,8 @@ def check_flow(ds, refvar="flow_rate", variance=0.1, p_dep = False):
             Variable used to check flow rate (default: "flow_rate")
         variance: float, optional
             Allowed deviation from mean (default: 0.1 = 10%)
+        p_dep: boolean
+            If True, the flow depends on the pressure and the check will be done for flow/pressure.
 
     Returns:
         xarray.Dataset: Data with flow anomalies removed
@@ -830,5 +832,17 @@ def mask_out_dropsonde_peaks(ds, out_vars):
     return ds
 
 def mask_out_data_gaps(ds, var):
+    """
+    Masking out data gaps, where a variable is constantly zero.
+
+    Args:
+        ds: xr.Dataset
+            input data set
+        var: str
+            variable to check for data gaps
+
+    Returns:
+        xarray.Dataset: Dataset with data gaps masked out
+    """
     ds = ds.where(ds[var] > 0)
     return ds
