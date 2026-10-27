@@ -17,9 +17,9 @@ import yaml
 import re
 from pathlib import Path
 from datetime import datetime
-import pint_xarray
 import os
 import glob
+
 
 def import_dictionary(yaml_file):
     """
@@ -43,6 +43,7 @@ def import_dictionary(yaml_file):
     except:
         print(f"{yaml_file}: yaml file not found or import error!!!")
 
+
 def add2logfile(logfile, text):
     """
     Writes text in the logfile.
@@ -54,7 +55,8 @@ def add2logfile(logfile, text):
             Text which should be added to the logfile
     """
     with logfile.open("a") as f:
-        f.write(text+"\n")
+        f.write(text + "\n")
+
 
 def create_logfile(config):
     """
@@ -69,7 +71,7 @@ def create_logfile(config):
     Returns:
         str: Path to logfile
     """
-    fn = config["paths"]["processing_log_file"]+"turbulence_processing_log.txt"
+    fn = config["paths"]["processing_log_file"] + "turbulence_processing_log.txt"
     logfile = Path(fn)
     # Create the file if it doesn't exist
     if not logfile.exists():
@@ -78,6 +80,7 @@ def create_logfile(config):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     add2logfile(logfile, f"{now}: processing starting")
     return logfile
+
 
 def get_variable_names(xml_file):
     """
@@ -118,6 +121,7 @@ def get_variable_names(xml_file):
     except:
         print("No xml file found!!!")
 
+
 def import_data(v, config, flight):
     """
     Import file for single variable using path and prefix for the specific flight from config file.
@@ -135,8 +139,9 @@ def import_data(v, config, flight):
     """
     old_name = vars[v]["old"]
     fn = f"{config['flights'][flight]['data_dir']}/{config['flights'][flight]['prefix']}{old_name}.dat"
-    df = pd.read_csv(fn, header  = 4, sep = r'\s+', names = ["date", "time", f"{v}"])
+    df = pd.read_csv(fn, header=4, sep=r'\s+', names=["date", "time", f"{v}"])
     return df
+
 
 def get_timestamps(df):
     """
@@ -150,9 +155,10 @@ def get_timestamps(df):
         pandas.DataFrame: Dataframe with the same data but datetime64 timestamps.
     """
     dates_fixed = np.array([d.replace('/', '-') for d in df["date"]], dtype=object)
-    times = (dates_fixed+"T" +df["time"].values).astype("datetime64[ns]")
+    times = (dates_fixed + "T" + df["time"].values).astype("datetime64[ns]")
     df = pd.DataFrame({"time": times, df.keys()[-1]: df[df.keys()[-1]]})
     return df
+
 
 def check_sampling(df, v, var_dict, logfile):
     """
@@ -189,6 +195,7 @@ def check_sampling(df, v, var_dict, logfile):
             f.write(f"{v}: only {percentage:.1f}% match; bounds: {low:.5f}–{high:.5f}s")
     else:
         print(f"{v}: ✅ Sampling OK: {percentage:.1f}% within tolerance")
+
 
 def find_gaps(df, v, var_dict, logfile, gap_factor=2.0):
     """
@@ -227,11 +234,13 @@ def find_gaps(df, v, var_dict, logfile, gap_factor=2.0):
     if len(gaps_df) > 0:
         add2logfile(logfile, f"{v}: gaps")
         for i in np.arange(len(gaps_df)):
-            add2logfile(logfile, f"{i}: period: {gaps_df.iloc[0]['start_time']} - {gaps_df.iloc[0]['end_time']}, duration: {gaps_df.iloc[0]['gap_duration_s']} s")
+            add2logfile(logfile,
+                        f"{i}: period: {gaps_df.iloc[0]['start_time']} - {gaps_df.iloc[0]['end_time']}, duration: {gaps_df.iloc[0]['gap_duration_s']} s")
 
     return gaps_df
 
-def interpolate_time(df, v, var_dict, steps = 0.01):
+
+def interpolate_time(df, v, var_dict, steps=0.01):
     """
     Linearly interpolate time on common timestamps with 100 Hz (or choose accordingly), convert to xarray dataset.
 
@@ -249,20 +258,23 @@ def interpolate_time(df, v, var_dict, steps = 0.01):
         xarray.Dataset: Dataset interpolated to step frequency, default is 100 Hz.
     """
     if type(df[v].values[-1]) == np.datetime64:
-        ds = xr.Dataset(coords = {"time": df["time"]}, data_vars = {v: ("time", df[v].values)})
+        ds = xr.Dataset(coords={"time": df["time"]}, data_vars={v: ("time", df[v].values)})
         ds['sec_since1970'] = ds[v].astype('int64')
         ds = ds.resample(time=f"0.01s").interpolate("linear")
         ds[v] = ds['sec_since1970'].astype('datetime64[ns]')
         ds = ds[[v]]
     else:
         ds = df.set_index("time").to_xarray()
-        if var_dict[v]["units_old"] == "degree" and v not in ["pitch_inat", "roll_inat", "rolr", "pitr", "pit", "roll", "lat", "lon", "lat_inat", "lon_inat", "lat_gprmc", "lon_gprmc"]: # Circular mean if unit in degrees
+        if var_dict[v]["units_old"] == "degree" and v not in ["pitch_inat", "roll_inat", "rolr", "pitr", "pit", "roll",
+                                                              "lat", "lon", "lat_inat", "lon_inat", "lat_gprmc",
+                                                              "lon_gprmc"]:  # Circular mean if unit in degrees
             sin = np.sin(np.deg2rad(ds[v])).resample(time=f"{steps}s").interpolate("linear")
             cos = np.cos(np.deg2rad(ds[v])).resample(time=f"{steps}s").interpolate("linear")
-            ds = (np.rad2deg(np.arctan2(sin,cos)) % 360).to_dataset(name = v)
+            ds = (np.rad2deg(np.arctan2(sin, cos)) % 360).to_dataset(name=v)
         else:
             ds = ds.resample(time=f"{steps}s").interpolate("linear")
     return ds
+
 
 def add_attrs_var(ds, v, var_dict):
     """
@@ -294,6 +306,7 @@ def add_attrs_var(ds, v, var_dict):
             ds[v].attrs["units"] = unit
     return ds
 
+
 def add_global_attrs(ds, config, flight):
     """
     This function adds metadata to the data set as stated in the config file.
@@ -311,6 +324,7 @@ def add_global_attrs(ds, config, flight):
     title = f"{config['campaign']['name']} RF{flight:02} {config['flights'][flight]['date']}: Calibrated raw data"
     ds.attrs["title"] = title
     return ds
+
 
 def convert_unit(ds, var_dict, v):
     """
@@ -338,6 +352,7 @@ def convert_unit(ds, var_dict, v):
         ds = ds_unit_new.to_dataset().pint.dequantify()
     return ds
 
+
 def g_welmec(lat, h):
     """
     Ratio of gravitational acceleration according to Welmec-Formula devided by 9.81.
@@ -351,8 +366,10 @@ def g_welmec(lat, h):
     Returns:
         xarray.DataArray: Dataarray with latitude and height dependent values of g.
     """
-    g_ratio = (9.780318 * (1 + 0.0053024 * np.sin(np.deg2rad(lat))**2 - 0.0000058 * np.sin(2*np.deg2rad(lat))**2) - 0.000003085 * h)
+    g_ratio = (9.780318 * (1 + 0.0053024 * np.sin(np.deg2rad(lat)) ** 2 - 0.0000058 * np.sin(
+        2 * np.deg2rad(lat)) ** 2) - 0.000003085 * h)
     return g_ratio
+
 
 def get_global_attributes(ds, config, instrument, flight):
     """
@@ -385,6 +402,7 @@ def get_global_attributes(ds, config, instrument, flight):
         print("No instrument metadata in config file")
         return ds
 
+
 def get_global_attributes_without_flight(ds, config, instrument):
     """
     Assigns attributes to the data set according to the config file.
@@ -413,6 +431,7 @@ def get_global_attributes_without_flight(ds, config, instrument):
         print("No instrument metadata in config file")
         return ds
 
+
 def add_segment_coordinate(ds, config, flight):
     """
     Assigns segment coordinate to a data set.
@@ -433,7 +452,7 @@ def add_segment_coordinate(ds, config, flight):
         segments = import_dictionary(seg_fn)
         flight_segments = segments["flights"][flight]["segments"]
 
-        times  = [np.datetime64(s["time"]) for s in flight_segments]
+        times = [np.datetime64(s["time"]) for s in flight_segments]
         labels = [s["segment"] for s in flight_segments]
 
         # For each timestep, find which segment it belongs to
@@ -447,6 +466,7 @@ def add_segment_coordinate(ds, config, flight):
     except:
         print("No segment file available")
         return ds
+
 
 def read_uhsas(path, name_row=0, encoding="latin-1", date_format="%m/%d/%Y"):
     """
@@ -469,7 +489,7 @@ def read_uhsas(path, name_row=0, encoding="latin-1", date_format="%m/%d/%Y"):
     Returns:
         pandas.DataFrame: imported UHSAS data
     """
-   # --- header lines ---------------------------------------------------
+    # --- header lines ---------------------------------------------------
     with open(path, "r", encoding=encoding, errors="replace") as f:
         headers = [next(f).rstrip("\r\n").split("\t") for _ in range(2)]
     names = [h.strip() for h in headers[name_row]]
@@ -518,12 +538,13 @@ def read_uhsas(path, name_row=0, encoding="latin-1", date_format="%m/%d/%Y"):
         df = df[~df.index.isna()]
 
     # --- time as a normal first column, row number as index -------------
-    df = df.reset_index()          # 'time' becomes column 0, index = 0..n-1
+    df = df.reset_index()  # 'time' becomes column 0, index = 0..n-1
     df.index.name = "row"
 
     df.attrs["header_other"] = dict(zip(unique[2:-2], other[2:]))
     df.attrs["source"] = path
     return df
+
 
 def import_device_data(indir, dev, time_offset):
     """
@@ -540,7 +561,7 @@ def import_device_data(indir, dev, time_offset):
     Returns:
         xarray.Dataset: combined data from files in input directory
     """
-    if dev  == "mcpc":
+    if dev == "mcpc":
         files = np.sort([f for f in os.listdir(indir) if f.endswith('.TXT')])
     elif dev == "partector":
         files = np.sort([f for f in os.listdir(indir) if f.endswith('.txt')])
@@ -555,11 +576,11 @@ def import_device_data(indir, dev, time_offset):
     df_list = list()
     for fn in files:
         if dev == "mcpc":
-            df = pd.read_csv(f"{indir}/{fn}", header = 13, sep = "\t")
-            times = pd.to_datetime("20" + df["#YY/MM/DD"]+" "+df["HR:MN:SC"]) - np.timedelta64(time_offset, "ms")
+            df = pd.read_csv(f"{indir}/{fn}", header=13, sep="\t")
+            times = pd.to_datetime("20" + df["#YY/MM/DD"] + " " + df["HR:MN:SC"]) - np.timedelta64(time_offset, "ms")
             df["time"] = times
         elif dev == "partector":
-            df = pd.read_csv(f"{indir}/{fn}", header = 18, sep = "\t")
+            df = pd.read_csv(f"{indir}/{fn}", header=18, sep="\t")
             with open(f"{indir}/{fn}") as file:
                 date_str = [next(file) for x in range(9)][-1]
             clean = date_str.replace('Start: ', '').strip()
@@ -569,11 +590,11 @@ def import_device_data(indir, dev, time_offset):
             df["time"] = times
         elif dev == "partector_dms":
             df = pd.read_csv(f"{indir}/{fn}", sep=";", skiprows=[0, 2, 3], parse_dates=[0])
-            df = df.rename(columns = {'Unnamed: 0': "time"})
+            df = df.rename(columns={'Unnamed: 0': "time"})
             df["time"] = df["time"] - np.timedelta64(time_offset, "ms")
         elif dev == "kt19":
-            df = pd.read_csv(f"{indir}/{fn}", header  = 4, sep = r'\s+', names = ["date", "times", "KT19 Serial", "unit"])
-            times = pd.to_datetime(df["date"].values+"T"+df["times"].values)
+            df = pd.read_csv(f"{indir}/{fn}", header=4, sep=r'\s+', names=["date", "times", "KT19 Serial", "unit"])
+            times = pd.to_datetime(df["date"].values + "T" + df["times"].values)
             df["time"] = times - np.timedelta64(time_offset, "ms")
         elif dev == "uhsas":
             df = read_uhsas(f"{indir}/{fn}")
@@ -587,7 +608,8 @@ def import_device_data(indir, dev, time_offset):
     ds = df_all.to_xarray()
     return ds
 
-def resample2sec(ds, dev, freq = "1s"):
+
+def resample2sec(ds, dev, freq="1s"):
     """
     Resample data to 1s (default) temporal resolution.
 
@@ -605,7 +627,7 @@ def resample2sec(ds, dev, freq = "1s"):
         xarray.Dataset: resampled dataset if sampling is put to True. Else ds is not changed
     """
     if dev == "uhsas":
-        mean_vars  = ["p_amb", "flow_rate"]
+        mean_vars = ["p_amb", "flow_rate"]
         sum_vars = [v for v in ds.data_vars if v not in mean_vars]
         res = xr.merge([
             ds[sum_vars].resample(time="1s").sum(skipna=True),
@@ -613,8 +635,9 @@ def resample2sec(ds, dev, freq = "1s"):
         ])
         ds = res
     else:
-        ds = ds.resample(time = freq).nearest()
+        ds = ds.resample(time=freq).nearest()
     return ds
+
 
 def import_radiation_data(fn, name):
     """
@@ -629,11 +652,12 @@ def import_radiation_data(fn, name):
     Returns:
         xarray.Dataset: data set with variable data
     """
-    data = pd.read_csv(fn, header  = 4, sep = r'\s+', names = ["date", "times", name])
-    times = pd.to_datetime(data["date"].values+"T"+data["times"].values)
+    data = pd.read_csv(fn, header=4, sep=r'\s+', names=["date", "times", name])
+    times = pd.to_datetime(data["date"].values + "T" + data["times"].values)
     data["time"] = times
     ds = data.set_index("time").to_xarray()
     return ds
+
 
 def import_licor(out_vars, indir):
     """
@@ -652,8 +676,8 @@ def import_licor(out_vars, indir):
     for v in out_vars.keys():
         old_name = out_vars[v]["old"]
         fn = glob.glob(f"{indir}/*{old_name}.dat")[0]
-        data = pd.read_csv(fn, header  = 4, sep = r'\s+', names = ["date", "times", old_name])
-        times = pd.to_datetime(data["date"].values+"T"+data["times"].values)
+        data = pd.read_csv(fn, header=4, sep=r'\s+', names=["date", "times", old_name])
+        times = pd.to_datetime(data["date"].values + "T" + data["times"].values)
         data["time"] = times
         ds = data.set_index("time").to_xarray()
         # Remove non-unique time stamps which occurred once during BACSAM II:
@@ -662,6 +686,7 @@ def import_licor(out_vars, indir):
         datasets.append(ds)
 
     return xr.merge(datasets, join='outer', compat='no_conflicts')
+
 
 def import_dropsondes(config):
     """
@@ -676,7 +701,7 @@ def import_dropsondes(config):
     """
     out = None
     num = 0
-    
+
     for f in list(config["flights"].keys()):
         start = np.datetime64(config["flights"][f]["start"])
         stop = np.datetime64(config["flights"][f]["stop"])
@@ -694,7 +719,7 @@ def import_dropsondes(config):
                               f"({start} - {stop})")
                         continue
                     # Import data
-                    df = pd.read_csv(fn, header = 8, sep = ",", on_bad_lines="skip")
+                    df = pd.read_csv(fn, header=8, sep=",", on_bad_lines="skip")
                     times = pd.to_datetime(df["Data Date & Time (UTC)"])
                     ds = df.to_xarray()
                     ds = ds.assign_coords({"time": (["index"], times)})
@@ -703,19 +728,20 @@ def import_dropsondes(config):
                     ds = ds.swap_dims({"index": "time"})
                     # Get landing time
                     near_zero = np.abs(ds["GPS Vert Velocity (m/s)"]) < 0.1
-                    window = 10  
+                    window = 10
                     rolling_ok = near_zero.rolling(time=window).sum() == window
-                    landing_idx = rolling_ok.argmax().item()  
+                    landing_idx = rolling_ok.argmax().item()
                     landing_time = ds.time.isel(time=landing_idx - window).values
                     # Prepare data set
-                    ds = ds.sel(time = slice(launch_time, landing_time))
-                    ds = ds.where(ds["RSS421 Pressure (mb)"] > -998, drop = True)
-                    seconds_since_launch = (((ds.time - np.datetime64(launch_time)).values).astype("float"))/10**9
+                    ds = ds.sel(time=slice(launch_time, landing_time))
+                    ds = ds.where(ds["RSS421 Pressure (mb)"] > -998, drop=True)
+                    seconds_since_launch = (((ds.time - np.datetime64(launch_time)).values).astype("float")) / 10 ** 9
                     ds = ds.assign_coords({"sec_since_launch": (["time"], seconds_since_launch)})
                     idx = np.arange(len(ds.time))
                     num = num + 1
                     ds = ds.assign_coords({"number": [num], "index": (["time"], idx)})
-                    ds = ds.assign_coords({"flight": (["number"], [f]), "launch_time": (["number"], [ds.time.values[0]])})
+                    ds = ds.assign_coords(
+                        {"flight": (["number"], [f]), "launch_time": (["number"], [ds.time.values[0]])})
                     ds = ds.swap_dims({"time": "index"})
                     out = ds if out is None else xr.concat([out, ds], dim="number")
                 except:
