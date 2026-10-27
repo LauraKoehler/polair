@@ -91,10 +91,9 @@ def run(args):
 
     # adiabatic corrections for sensors in Rosemount/Goodrich housings
     etaE = 1.00025  # recovery factor for deiced sensors
-    for temp in ["Te_T"]:
-        name = f"{temp}_corr"
-        da = corr.sat_correction(data, data_corr, temp).rename(name)
-        data_corr[name] = da
+    name = "Te_T_corr"
+    da = corr.sat_correction(data, data_corr, "Te_T").rename(name)
+    data_corr[name] = da
 
     # In case of switched antennas (stated in config), reverse angles
     switched_antennas = config["campaign"]["tbird_reversed_antennas"]
