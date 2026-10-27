@@ -121,7 +121,8 @@ def get_variable_names(xml_file):
     except:
         print("No xml file found!!!")
 
-
+#TODO: This function seems not to be used, also vars is a built in function and
+# cannot be used with []
 def import_data(v, config, flight):
     """
     Import file for single variable using path and prefix for the specific flight from config file.
