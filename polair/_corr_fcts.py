@@ -37,8 +37,10 @@ def sat_correction(ds, ds_corr, t, recovery=1.0):
     Returns:
         xarray.DataArray: Corrected temperature
     """
-    ps_dict = {"Te_T": "ps", "TejB": "psB", "ThuB": "psB", "Te_N": "ps", "ThuN": "ps", "TejN": "ps"} # corresponding static pressures
-    qs_dict = {"Te_T": "qc", "TejB": "qcB", "ThuB": "qcB", "Te_N": "qc", "ThuN": "qc", "TejN": "qc"} # corresponding dynamic pressures
+    ps_dict = {"Te_T": "ps", "TejB": "psB", "ThuB": "psB", "Te_N": "ps", "ThuN": "ps",
+               "TejN": "ps"}  # corresponding static pressures
+    qs_dict = {"Te_T": "qc", "TejB": "qcB", "ThuB": "qcB", "Te_N": "qc", "ThuN": "qc",
+               "TejN": "qc"}  # corresponding dynamic pressures
     R_over_cp = 0.2858964
     temp = ds[t]
     if t in ["Te_N", "ThuN", "TejN", "Te_T"]:
@@ -62,7 +64,7 @@ def sat_pressure(temp):
     Returns:
         xarray.DataArray: Saturation pressure in hPa
     """
-    es = 6.1094 * np.exp(17.625 * (temp - 273.15)/(temp - 273.15 + 243.04))
+    es = 6.1094 * np.exp(17.625 * (temp - 273.15) / (temp - 273.15 + 243.04))
     return es
 
 
@@ -85,7 +87,7 @@ def humidity_correction(rh, T_sensor, T_amb):
     """
     es_sensor = sat_pressure(T_sensor)
     es_amb = sat_pressure(T_amb)
-    out = rh * (es_sensor/es_amb)
+    out = rh * (es_sensor / es_amb)
     out = out.where(out <= 1.0, 1.0)
     return out
 
@@ -139,9 +141,9 @@ def get_w_ins(data, start, stop, deltat=0.01):
     """
     w_ins = deltat * data["azg"].sel(time=slice(start, stop)).cumsum(dim="time")
     # Remove Schuler oscillation
-    fs = 1/deltat  # Hz (sampling rate)
-    fc = 1/(84*60)  # Hz (cutoff for Schuler oscillation)
-    b, a = sig.butter(N=2, Wn=fc/(fs/2), btype='highpass')
+    fs = 1 / deltat  # Hz (sampling rate)
+    fc = 1 / (84 * 60)  # Hz (cutoff for Schuler oscillation)
+    b, a = sig.butter(N=2, Wn=fc / (fs / 2), btype='highpass')
     w_ins_hp = xr.apply_ufunc(sig.filtfilt, b, a, w_ins)
     w_ins_hp = w_ins_hp.to_dataset(name="w_ins")
     return w_ins_hp
@@ -269,27 +271,27 @@ def alignement_correction(data, fhp_params, v, platform, twist_angle):
         elif v in ["qb"]:
             out = np.cos(twist_angle) * data.qbN - np.sin(twist_angle) * data.qaN
         elif v in ["alpha"]:
-            out = a0 + a1_qratio * (np.cos(twist_angle) * data.qaN + np.sin(twist_angle) * data.qbN)/data.qcN
+            out = a0 + a1_qratio * (np.cos(twist_angle) * data.qaN + np.sin(twist_angle) * data.qbN) / data.qcN
         elif v in ["beta"]:
             b0 = fhp_params[platform]["qb"]["a0"]
             b1_qb = fhp_params[platform]["qb"]["a1_qb"]
             b1_qc = fhp_params[platform]["qb"]["a1_qc"]
             b1_ps = fhp_params[platform]["qb"]["a1_ps"]
             qb = b0 + b1_qb * data.qbN + b1_qc * data.qcN + b1_ps * data.psN
-            out = a0 + a1_qratio * qb/data.qcN
+            out = a0 + a1_qratio * qb / data.qcN
     elif platform == "tbird":
         if v in ["qb", "qc", "ps"]:
             out = a0 + a1_qb * data.qbT + a1_qc * data.qcT + a1_ps * data.psT
         elif v in ["alpha"]:
-            out = a0 + a1_qratio * data.qaT/data.qcT
+            out = a0 + a1_qratio * data.qaT / data.qcT
         elif v in ["beta"]:
-             out = a0 + a1_qratio * data.qbT/data.qcT
-#            b0 = fhp_params[platform]["qb"]["a0"]
-#            b1_qb = fhp_params[platform]["qb"]["a1_qb"]
-#            b1_qc = fhp_params[platform]["qb"]["a1_qc"]
-#            b1_ps = fhp_params[platform]["qb"]["a1_ps"]
-#            qb = b0 + b1_qb * data.qbT + b1_qc * data.qcT + b1_ps * data.psT
-#            out = a0 + a1_qratio * qb/data.qcT
+            out = a0 + a1_qratio * data.qbT / data.qcT
+    #            b0 = fhp_params[platform]["qb"]["a0"]
+    #            b1_qb = fhp_params[platform]["qb"]["a1_qb"]
+    #            b1_qc = fhp_params[platform]["qb"]["a1_qc"]
+    #            b1_ps = fhp_params[platform]["qb"]["a1_ps"]
+    #            qb = b0 + b1_qb * data.qbT + b1_qc * data.qcT + b1_ps * data.psT
+    #            out = a0 + a1_qratio * qb/data.qcT
     return out
 
 
@@ -314,7 +316,7 @@ def get_true_air_speed(data, platform):
         pres = "ps"
     Rs = 287.0528
     rho = (data[pres]) / (Rs * data[temp])
-    tas = np.sqrt(2 * data.qc/rho)
+    tas = np.sqrt(2 * data.qc / rho)
     return tas
 
 
@@ -388,18 +390,18 @@ def correct_ttrk_inat_with_gps(data, data_corr):
     Returns:
         xarray.Dataset: GPS-corrected INAT true track
     """
-#    v= "ttrk_inat_corr"
-#    lat = data.lat_inat
-#    lon = data.lon_inat
-#    gps_v = true_track_xarray(lat, lon, lat.shift(time=-1), lon.shift(time=-1))
+    #    v= "ttrk_inat_corr"
+    #    lat = data.lat_inat
+    #    lon = data.lon_inat
+    #    gps_v = true_track_xarray(lat, lon, lat.shift(time=-1), lon.shift(time=-1))
 
-#    rolling_inat = data_corr[v].rolling(time = 1000, center = True).mean()
-#    rolling_gps = gps_v.rolling(time = 1000, center = True).mean()
-    
-#    difference = rolling_inat - rolling_gps
-    
-#    corrected = (data_corr[v] - difference) % 360
-#    corrected = corrected.to_dataset(name = f"{v}")
+    #    rolling_inat = data_corr[v].rolling(time = 1000, center = True).mean()
+    #    rolling_gps = gps_v.rolling(time = 1000, center = True).mean()
+
+    #    difference = rolling_inat - rolling_gps
+
+    #    corrected = (data_corr[v] - difference) % 360
+    #    corrected = corrected.to_dataset(name = f"{v}")
     v = "ttrk_inat_corr"
     lat = data.lat_inat
     lon = data.lon_inat
@@ -505,14 +507,14 @@ def get_wind_component(data, data_corr, component, platform):
         vup = data_corr["w_ins_corr"]
     elif platform == "tbird":
         theta = np.deg2rad(data_corr["pitch_inat_corr"])
-        theta_rate = theta.diff("time")/0.01
+        theta_rate = theta.diff("time") / 0.01
         phi = np.deg2rad(data_corr["roll_inat_corr"])
-        phi_rate = phi.diff("time")/0.01
+        phi_rate = phi.diff("time") / 0.01
         alpha = np.deg2rad(data_corr["alpha"])
         beta = np.deg2rad(data_corr["beta"])
         ttrk = np.deg2rad(data_corr["ttrk_inat_corr"])
         thdg = np.deg2rad(data_corr["thdg_inat_corr"])
-        psi_rate = -(thdg - thdg.shift(time=1))/0.01
+        psi_rate = -(thdg - thdg.shift(time=1)) / 0.01
         c1, c2, c3 = 0.0, 0.0, 0.0
         vrxf = c1 * theta_rate - c2 * psi_rate
         vryf = c3 * psi_rate - c1 * phi_rate
@@ -520,41 +522,41 @@ def get_wind_component(data, data_corr, component, platform):
         vns = data["gs_inat"] * np.cos(ttrk)
         vew = data["gs_inat"] * np.sin(ttrk)
         h_inat = data["h_inat"].where(np.abs(data["h_inat"].diff("time")) < 1.5)
-        vup = h_inat.rolling(time=100, center=True).mean().diff("time")/0.01
+        vup = h_inat.rolling(time=100, center=True).mean().diff("time") / 0.01
 
     # Calculate ground-relative wind components
     uKg = (vew
            + vrxf * np.cos(theta) * np.sin(thdg)
            + vryf * (np.sin(phi) * np.sin(theta) * np.sin(thdg) + np.cos(phi) * np.cos(thdg))
            + vrzf * (np.cos(phi) * np.sin(theta) * np.sin(thdg) - np.sin(phi) * np.cos(thdg))
-        )
+           )
     vKg = (vns +
            vrxf * np.cos(theta) * np.cos(thdg)
            + vryf * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))
            + vrzf * (np.cos(phi) * np.sin(theta) * np.cos(thdg) + np.sin(phi) * np.sin(thdg))
-          )
+           )
     wKg = (vup
            + vrxf * np.sin(theta)
            - vryf * np.sin(phi) * np.cos(theta)
            - vrzf * np.cos(phi) * np.cos(theta)
-          )
+           )
 
     # Calculate air-relative wind components
     ug = (data_corr["tas"] *
-              (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.sin(thdg)
-               + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.sin(thdg) + np.cos(phi) * np.cos(thdg))
-               + np.sin(alpha) * np.cos(beta) * (np.cos(phi) * np.sin(theta) * np.sin(thdg) - np.sin(phi) * np.cos(thdg))
-             ))
+          (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.sin(thdg)
+           + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.sin(thdg) + np.cos(phi) * np.cos(thdg))
+           + np.sin(alpha) * np.cos(beta) * (np.cos(phi) * np.sin(theta) * np.sin(thdg) - np.sin(phi) * np.cos(thdg))
+           ))
     vg = (data_corr["tas"] *
-                (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.cos(thdg)
-              + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))
-              + np.sin(alpha) * np.cos(beta) * (np.cos(phi) * np.sin(theta) * np.cos(thdg) + np.sin(phi) * np.sin(thdg))
-                ))
+          (np.cos(alpha) * np.cos(beta) * np.cos(theta) * np.cos(thdg)
+           + np.sin(beta) * (np.sin(phi) * np.sin(theta) * np.cos(thdg) - np.cos(phi) * np.sin(thdg))
+           + np.sin(alpha) * np.cos(beta) * (np.cos(phi) * np.sin(theta) * np.cos(thdg) + np.sin(phi) * np.sin(thdg))
+           ))
     wg = -(data_corr["tas"] *
-              (-np.cos(alpha) * np.cos(beta) * np.sin(theta)
-               + np.sin(beta) * np.sin(phi) * np.cos(theta)
-               + np.sin(alpha) * np.cos(beta) * np.cos(phi) * np.cos(theta)
-             ))
+           (-np.cos(alpha) * np.cos(beta) * np.sin(theta)
+            + np.sin(beta) * np.sin(phi) * np.cos(theta)
+            + np.sin(alpha) * np.cos(beta) * np.cos(phi) * np.cos(theta)
+            ))
 
     if component == "u":
         out = uKg - ug
@@ -564,6 +566,7 @@ def get_wind_component(data, data_corr, component, platform):
         out = wKg - wg
         out = out - out.mean()
     return out
+
 
 def mask_out_peaks(ds, refvar="p_amb", threshold=5000, timedelta=1):
     """
@@ -592,7 +595,8 @@ def mask_out_peaks(ds, refvar="p_amb", threshold=5000, timedelta=1):
     ds = ds.where(mask)
     return ds
 
-def check_flow(ds, refvar="flow_rate", variance=0.1, p_dep = False):
+
+def check_flow(ds, refvar="flow_rate", variance=0.1, p_dep=False):
     """
     Remove flow anomalies where flow rate varies more than specified percentage from average.
 
@@ -608,8 +612,8 @@ def check_flow(ds, refvar="flow_rate", variance=0.1, p_dep = False):
         xarray.Dataset: Data with flow anomalies removed
     """
     if p_dep:
-        mean = (ds[refvar]/ds["p_amb"]).mean()
-        mask = np.abs((ds[refvar]/ds["p_amb"]) - mean) < variance * mean
+        mean = (ds[refvar] / ds["p_amb"]).mean()
+        mask = np.abs((ds[refvar] / ds["p_amb"]) - mean) < variance * mean
     else:
         mean = ds[refvar].mean()
         mask = np.abs(ds[refvar] - mean) < variance * mean
@@ -621,6 +625,7 @@ def check_flow(ds, refvar="flow_rate", variance=0.1, p_dep = False):
     )
     ds = ds.where(mask)
     return ds
+
 
 def ampbox2swr_pyranometer(I):
     """
@@ -636,12 +641,13 @@ def ampbox2swr_pyranometer(I):
         xarray.DataArray: Radiation in W/m²
     """
     # DMS: "4-20mA correspond to -50 W/m² to + 1950 W/m²"
-    I_min, I_max = 4e-3, 20e-3    # A
-    R_min, R_max = -50, 1950    # W/m2
+    I_min, I_max = 4e-3, 20e-3  # A
+    R_min, R_max = -50, 1950  # W/m2
 
     # Linear interpolation current → voltage (V)
     R = (I - I_min) / (I_max - I_min) * (R_max - R_min) + R_min
     return R
+
 
 def ampbox2lwr_pyrgeometer(I, T):
     """
@@ -658,18 +664,19 @@ def ampbox2lwr_pyrgeometer(I, T):
     Returns:
         xarray.DataArray: Longwave radiation in W/m²
     """
-    sigma = 5.670374 * 10**(-8)
+    sigma = 5.670374 * 10 ** (-8)
 
     # DMS: "4-20mA correspond to -400 W/m² to +400 W/m²"
-    I_min, I_max = 4e-3, 20e-3    # A
-    R_min, R_max = -400, 400    # W/m2
+    I_min, I_max = 4e-3, 20e-3  # A
+    R_min, R_max = -400, 400  # W/m2
 
     # Linear interpolation current → power flux (W/m2)
     R = (I - I_min) / (I_max - I_min) * (R_max - R_min) + R_min
 
     # Temperature correction
-    G = R + sigma * T**4
+    G = R + sigma * T ** 4
     return G
+
 
 def resistance2temperature(R):
     """
@@ -682,10 +689,11 @@ def resistance2temperature(R):
     Returns:
         xarray.DataArray: Temperature in K
     """
-    a = 3.9080 * 10**(-3)
-    b = -5.8019 * 10**(-7)
-    t = (-a + np.sqrt(a**2 - 4 * b * (-R/100 + 1)))/(2 * b) + 273.15
+    a = 3.9080 * 10 ** (-3)
+    b = -5.8019 * 10 ** (-7)
+    t = (-a + np.sqrt(a ** 2 - 4 * b * (-R / 100 + 1))) / (2 * b) + 273.15
     return t
+
 
 def get_radiation(config, flight, out_vars):
     """
@@ -724,6 +732,7 @@ def get_radiation(config, flight, out_vars):
 
     return out
 
+
 def stp_conditions(ds, temp="t_amb", pres="p_amb"):
     """
     Add variables reduced to standard temperature and pressure (STP).
@@ -752,11 +761,12 @@ def stp_conditions(ds, temp="t_amb", pres="p_amb"):
 
     for v in ds.keys():
         if v in list(stp_vars.keys()):
-            stp_corr = ds[v] * 101300/273.15 * ds[temp]/ds[pres]
+            stp_corr = ds[v] * 101300 / 273.15 * ds[temp] / ds[pres]
             ds[f"{v}_stp"] = stp_corr
             if v == "number_conc":
                 ds[f"{v}_stp"].attrs = stp_vars[v]
     return ds
+
 
 def mask_jumps(da, dim="time", threshold=10, on="diff"):
     """
@@ -793,6 +803,7 @@ def mask_jumps(da, dim="time", threshold=10, on="diff"):
         mask = mask.reindex({dim: da[dim]}, fill_value=False)
     return mask
 
+
 def mask_out_jumps(ds, out_vars):
     """
     Masking out peaks in the licor data
@@ -811,6 +822,7 @@ def mask_out_jumps(ds, out_vars):
         ds = ds.where(~mask)
     return ds
 
+
 def mask_out_dropsonde_peaks(ds, out_vars):
     """
     Masking out peaks in the licor data
@@ -828,6 +840,7 @@ def mask_out_dropsonde_peaks(ds, out_vars):
         mask = mask_jumps(ds[v], dim="index")
         ds[v] = ds[v].where(~mask)
     return ds
+
 
 def mask_out_data_gaps(ds, var):
     ds = ds.where(ds[var] > 0)
