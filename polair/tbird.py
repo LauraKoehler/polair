@@ -24,6 +24,7 @@ from . import _corr_fcts as corr
 import os
 import xarray as xr
 
+
 def configure_tbird_parser(parser):
     parser.add_argument(
         "-f",
@@ -50,7 +51,8 @@ def configure_tbird_parser(parser):
     )
 
     parser.set_defaults(func=run)
-    
+
+
 def run(args):
     flight = int(args.flight)
     config_file = args.config
@@ -61,10 +63,10 @@ def run(args):
     indir = config["paths"]["outdirs"]["raw"]
     outdir = config["paths"]["outdirs"]["tbird"]
     os.makedirs(outdir, exist_ok=True)
-    flight_date = str(config["flights"][flight]["date"]).replace("-","")
+    flight_date = str(config["flights"][flight]["date"]).replace("-", "")
     campaign = config["campaign"]["name"]
-    fn_in = indir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
-    fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_tbird_100Hz.nc"
+    fn_in = indir + "/" + campaign + "_" + flight_date + f"_RF{flight:02}_calibrated_raw_data.nc"
+    fn_out = outdir + "/" + campaign + "_" + flight_date + f"_RF{flight:02}_tbird_100Hz.nc"
     start = config["flights"][flight]["start_tbird"]
     stop = config["flights"][flight]["stop_tbird"]
     h.add2logfile(logfile, f"T-Bird: {config['campaign']['name']}, flight {flight}, {flight_date}")
@@ -84,9 +86,9 @@ def run(args):
         data_corr[v] = da
 
     # Some corrections:
-    data_corr["qc"] = data_corr["qc"].where(data_corr["qc"]>0, other = 0)
-    data_corr["alpha"] = data_corr["alpha"].where(data_corr["qc"]>500, other = 0)
-    data_corr["beta"] = data_corr["beta"].where(data_corr["qc"]>500, other = 0)
+    data_corr["qc"] = data_corr["qc"].where(data_corr["qc"] > 0, other=0)
+    data_corr["alpha"] = data_corr["alpha"].where(data_corr["qc"] > 500, other=0)
+    data_corr["beta"] = data_corr["beta"].where(data_corr["qc"] > 500, other=0)
 
     # adiabatic corrections for sensors in Rosemount/Goodrich housings
     name = "Te_T_corr"
@@ -100,16 +102,16 @@ def run(args):
         name = f"{a}_corr"
         da = corr.reverse_antennas(data, a, switched_antennas).rename(name)
         data_corr[name] = da
-    
+
     data_corr["tas"] = corr.get_true_air_speed(data_corr, pf)
 
     # True track is GPS corrected using lat and lon from INAT which come from GPS. This is used as true heading in the wind computation.
     ttrk_corr = corr.correct_ttrk_inat_with_gps(data, data_corr)
     data_corr["ttrk_inat_corr"] = ttrk_corr.ttrk_inat_corr
 
-    data = data.sel(time = slice(start,stop))
-    data_corr = data_corr.sel(time = slice(start,stop))
-    
+    data = data.sel(time=slice(start, stop))
+    data_corr = data_corr.sel(time=slice(start, stop))
+
     for v in ["u", "v", "vertwind"]:
         wind_comp = corr.get_wind_component(data, data_corr, v, pf)
         data_corr[v] = wind_comp
@@ -125,7 +127,7 @@ def run(args):
         except KeyError:
             var_data = data_corr[[v_old]]
 
-        var_data = var_data.sel(time = slice(start,stop)).rename({v_old: v})
+        var_data = var_data.sel(time=slice(start, stop)).rename({v_old: v})
         var_data = h.add_attrs_var(var_data, v, out_vars)
         out_ds_list.append(var_data)
 

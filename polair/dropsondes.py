@@ -20,10 +20,11 @@ The dropsonde command processes dropsonde data for the entire campaign.
 """
 
 from . import _helpers as h
-from . import _corr_fcts as corr 
+from . import _corr_fcts as corr
 import numpy as np
 import xarray as xr
 import os
+
 
 def configure_dropsonde_parser(parser):
     parser.add_argument(
@@ -44,7 +45,8 @@ def configure_dropsonde_parser(parser):
     )
 
     parser.set_defaults(func=run)
-    
+
+
 def run(args):
     dev = "dropsondes"
     config_file = args.config
@@ -54,7 +56,7 @@ def run(args):
     outdir = config["paths"]["outdirs"][dev]
     os.makedirs(outdir, exist_ok=True)
     campaign = config["campaign"]["name"]
-    fn_out = outdir+"/"+campaign+f"_{dev}.nc"
+    fn_out = outdir + "/" + campaign + f"_{dev}.nc"
 
     out_vars = h.import_dictionary(config["paths"]["processed_variables"])
     out_vars = out_vars[dev]
@@ -66,7 +68,7 @@ def run(args):
         v_old = out_vars[v]["old"]
         var_data = ds[[v_old]]
         var_data = var_data.rename({v_old: v})
-        var_data[v] = var_data[v].where(var_data[v]>-900, other = np.nan)
+        var_data[v] = var_data[v].where(var_data[v] > -900, other=np.nan)
         var_data = h.convert_unit(var_data, out_vars, v)
         var_data[v].attrs = {}
         var_data = h.add_attrs_var(var_data, v, out_vars)
@@ -74,7 +76,7 @@ def run(args):
 
     out_ds = xr.merge(ds_list, join='outer', compat='no_conflicts')
     out_ds = corr.mask_out_dropsonde_peaks(out_ds, out_vars)
-    
+
     out_ds = h.get_global_attributes_without_flight(out_ds, config, dev)
-    
+
     out_ds.to_netcdf(fn_out)
