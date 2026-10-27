@@ -25,11 +25,11 @@ Platform `p` is optional with default being `polar6`, add if platform is `tbird`
 """
 
 from . import _helpers as h
-from . import _corr_fcts as corr 
+from . import _corr_fcts as corr
 import numpy as np
 import xarray as xr
-import pandas as pd
 import os
+
 
 def configure_device_parser(parser):
     parser.add_argument(
@@ -71,7 +71,8 @@ def configure_device_parser(parser):
     )
 
     parser.set_defaults(func=run)
-    
+
+
 def run(args):
     flight = int(args.flight)
     config_file = args.config
@@ -101,9 +102,10 @@ def run(args):
             except KeyError:
                 print("input directory not found")
     outdir = config["paths"]["outdirs"][dev_name]
-    flight_date = str(config["flights"][flight]["date"]).replace("-","")
+    os.makedirs(outdir, exist_ok=True)
+    flight_date = str(config["flights"][flight]["date"]).replace("-", "")
     campaign = config["campaign"]["name"]
-    fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_{dev_name}.nc"
+    fn_out = outdir + "/" + campaign + "_" + flight_date + f"_RF{flight:02}_{dev_name}.nc"
     if pf == "polar6":
         start = np.datetime64(config["flights"][flight]["start"])
         stop = np.datetime64(config["flights"][flight]["stop"])
@@ -126,22 +128,23 @@ def run(args):
         ds = h.import_device_data(indir, dev, time_offset)
 
     var_list = list(out_vars.keys())
-    
+
     for v in var_list:
         v_old = out_vars[v]["old"]
         var_data = ds[[v_old]]
-        var_data = var_data.sel(time = slice(start,stop)).rename({v_old: v})
+        var_data = var_data.sel(time=slice(start, stop)).rename({v_old: v})
         var_data = h.convert_unit(var_data, out_vars, v)
         try:
             out_ds = xr.merge([out_ds, var_data])
         except:
             out_ds = var_data
-    
+
         out_ds[v].attrs = {}
         out_ds = h.add_attrs_var(out_ds, v, out_vars)
-        
-    # Resampling to 1 sec time resolution is only done if instrument listed in config file to resample. Otherwise, the original time stamps are kept.
-    try: 
+
+    # Resampling to 1 sec time resolution is only done if instrument listed in
+    # config file to resample. Otherwise, the original time stamps are kept.
+    try:
         toresample = config["campaign"]["resampling"]
     except:
         toresample = []
@@ -151,12 +154,12 @@ def run(args):
     try:
         if pf == "polar6":
             indir_pf = config["paths"]["outdirs"]["noseboom"]
-            fn_pf = indir_pf+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_noseboom_100Hz.nc"
+            fn_pf = indir_pf + "/" + campaign + "_" + flight_date + f"_RF{flight:02}_noseboom_100Hz.nc"
         elif pf == "tbird":
             indir_pf = config["paths"]["outdirs"]["tbird"]
-            fn_pf = indir_pf+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_tbird_100Hz.nc"
+            fn_pf = indir_pf + "/" + campaign + "_" + flight_date + f"_RF{flight:02}_tbird_100Hz.nc"
         data_pf = xr.open_dataset(fn_pf)
-        data_pf_int = data_pf.interp({"time":out_ds.time.values}, method = "nearest")
+        data_pf_int = data_pf.interp({"time": out_ds.time.values}, method="nearest")
         out_ds = out_ds.assign_coords({"lat": data_pf_int.lat, "lon": data_pf_int.lon, "alt": data_pf_int.alt})
         if dev in ["radiation"]:
             out_ds = out_ds.assign({"pitch": data_pf_int.pitch, "roll": data_pf_int["roll"]})
@@ -176,24 +179,24 @@ def run(args):
     if dev in list(dev_cuts.keys()):
         cut_start = dev_cuts[dev]["start"]
         cut_stop = dev_cuts[dev]["stop"]
-        out_ds = out_ds.sel(time = slice(start + np.timedelta64(cut_start,"s"), stop - np.timedelta64(cut_stop,"s")))
-    
+        out_ds = out_ds.sel(time=slice(start + np.timedelta64(cut_start, "s"), stop - np.timedelta64(cut_stop, "s")))
+
     if dev in ["uhsas"]:
         out_ds = corr.mask_out_data_gaps(out_ds, "total_counts")
     if dev in ["mcpc", "partector", "partector_dms", "uhsas"]:
         out_ds = corr.mask_out_peaks(out_ds)
-        try: 
+        try:
             p_dep_devices = config["campaign"]["flow_p_dep"]
         except:
             p_dep_devices = []
         if dev in p_dep_devices:
-            out_ds = corr.check_flow(out_ds, p_dep = True)
+            out_ds = corr.check_flow(out_ds, p_dep=True)
         else:
-            out_ds = corr.check_flow(out_ds, p_dep = False)
+            out_ds = corr.check_flow(out_ds, p_dep=False)
     if dev in ["licor", "mcpc"]:
         out_ds = corr.mask_out_jumps(out_ds, out_vars)
 
     out_ds = h.get_global_attributes(out_ds, config, dev_name, flight)
     out_ds = h.add_segment_coordinate(out_ds, config, flight)
-    
+
     out_ds.to_netcdf(fn_out)

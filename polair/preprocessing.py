@@ -24,10 +24,11 @@ The path to the config file and the flight number are required.
 """
 
 from . import _helpers as h
-from . import _calibration as calibration 
-import numpy as np
+from . import _calibration as calibration
+import os
 import xarray as xr
 import pandas as pd
+
 
 def configure_preprocessing_parser(parser):
     parser.add_argument(
@@ -55,7 +56,8 @@ def configure_preprocessing_parser(parser):
     )
 
     parser.set_defaults(func=run)
-    
+
+
 def run(args):
     # Preparation like importing config file etc.
     flight = int(args.flight)
@@ -66,11 +68,12 @@ def run(args):
     cal_file = h.import_dictionary(config["paths"]["calibration"])
     fn_prefix = f"{config['flights'][flight]['data_dir']}/{config['flights'][flight]['prefix']}"
     outdir = config["paths"]["outdirs"]["raw"]
-    flight_date = str(config["flights"][flight]["date"]).replace("-","")
+    os.makedirs(outdir, exist_ok=True)
+    flight_date = str(config["flights"][flight]["date"]).replace("-", "")
     campaign = config["campaign"]["name"]
-    fn_out = outdir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
+    fn_out = outdir + "/" + campaign + "_" + flight_date + f"_RF{flight:02}_calibrated_raw_data.nc"
     h.add2logfile(logfile, f"Preprocessing: {config['campaign']['name']}, flight {flight}, {flight_date}")
-    
+
     # Calibration of the raw data and interpolation to 100 Hz
     var_list = list(vars.keys())
     if not config["flights"][flight]["tbird"]:
@@ -78,22 +81,21 @@ def run(args):
             v for v in var_list
             if vars[v]["group"] not in ["tbird", "inat"]
         ]
+    df_list = list()
     for v in var_list:
         old_name = vars[v]["old"]
         fn = f"{config['flights'][flight]['data_dir']}/{config['flights'][flight]['prefix']}{old_name}.dat"
-        df = pd.read_csv(fn, header  = 4, sep = r'\s+', names = ["date", "time", f"{v}"])
+        df = pd.read_csv(fn, header=4, sep=r'\s+', names=["date", "time", f"{v}"])
         df = h.get_timestamps(df)
-        df = calibration.cal(v,cal_file,df, fn_prefix, vars)
+        df = calibration.cal(v, cal_file, df, fn_prefix, vars)
         h.check_sampling(df, v, vars, logfile)
         h.find_gaps(df, v, vars, logfile)
         ds = h.interpolate_time(df, v, vars)
         ds = h.convert_unit(ds, vars, v)
-        try:
-            data_100Hz = xr.merge([data_100Hz, ds])
-        except:
-            data_100Hz = ds
+        df_list.append(ds)
 
-    g_ratio = h.g_welmec(data_100Hz.lat_gprmc, data_100Hz.h_gpgga)/9.81
+    data_100Hz = xr.merge(df_list, join='outer', compat='no_conflicts')
+    g_ratio = h.g_welmec(data_100Hz.lat_gprmc, data_100Hz.h_gpgga) / 9.81
     for v in var_list:
         if str(vars[v]["units_old"])[:4] == "9.81":
             data_100Hz[v] = g_ratio * data_100Hz[v]

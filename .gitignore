@@ -2,5 +2,7 @@
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+
+# build folders
 /docs/build/
-_build/
+build/
