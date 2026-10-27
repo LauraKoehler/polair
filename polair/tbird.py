@@ -117,20 +117,19 @@ def run(args):
     # Cleaning up and prepare the output dataset
     out_vars = out_vars[pf]
     var_list = list(out_vars.keys())
+    out_ds_list = list()
     for v in var_list:
         v_old = out_vars[v]["old"]
-        if out_vars[v]["platform"] in ["tbird"]:
-            try:
-                var_data = data[[v_old]]
-            except:
-                var_data = data_corr[[v_old]]
-            var_data = var_data.sel(time = slice(start,stop)).rename({v_old: v})
-            try:
-                out_ds = xr.merge([out_ds, var_data])
-            except:
-                out_ds = var_data
-            out_ds = h.add_attrs_var(out_ds, v, out_vars)
+        try:
+            var_data = data[[v_old]]
+        except KeyError:
+            var_data = data_corr[[v_old]]
 
+        var_data = var_data.sel(time = slice(start,stop)).rename({v_old: v})
+        var_data = h.add_attrs_var(var_data, v, out_vars)
+        out_ds_list.append(var_data)
+
+    out_ds = xr.merge(out_ds_list, join='outer', compat='no_conflicts')
     out_ds = h.get_global_attributes(out_ds, config, pf, flight)
     out_ds = h.add_segment_coordinate(out_ds, config, flight)
 
