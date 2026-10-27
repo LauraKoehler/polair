@@ -56,7 +56,6 @@ def run(args):
     config_file = args.config
     config = h.import_dictionary(config_file)
     logfile = h.create_logfile(config)
-    vars = h.import_dictionary(config["paths"]["variables"])
     out_vars = h.import_dictionary(config["paths"]["processed_variables"])
     fhp_params = h.import_dictionary(config["paths"]["fiveholeprobe"])
     indir = config["paths"]["outdirs"]["raw"]
@@ -90,7 +89,6 @@ def run(args):
     data_corr["beta"] = data_corr["beta"].where(data_corr["qc"]>500, other = 0)
 
     # adiabatic corrections for sensors in Rosemount/Goodrich housings
-    etaE = 1.00025  # recovery factor for deiced sensors
     name = "Te_T_corr"
     da = corr.sat_correction(data, data_corr, "Te_T").rename(name)
     data_corr[name] = da
