@@ -23,7 +23,6 @@ from . import _helpers as h
 from . import _corr_fcts as corr
 import os
 import xarray as xr
-import pandas as pd
 
 def configure_tbird_parser(parser):
     parser.add_argument(
@@ -73,7 +72,10 @@ def run(args):
 
     data = xr.open_dataset(fn_in)
 
-    # Calibration of the pressures. For this, the calibration segments are used and the calibration factors are saved in fhp_params. The calibration has to be performed manually. Use the jupyter notebook Get_segments.ipynb.
+    # Calibration of the pressures.
+    # For this, the calibration segments are used and the calibration factors are saved in fhp_params.
+    # The calibration has to be performed manually.
+    # Use the jupyter notebook Get_segments.ipynb.
     pf = "tbird"
 
     twist_angle = 0
