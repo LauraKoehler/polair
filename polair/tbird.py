@@ -16,7 +16,7 @@ The tbird command determines the meteorological parameters from the T-Bird simil
 
     polair tbird -f <flight number> -c <config file>
 
-
+The path to the config file and the flight number are required.
 """
 
 from . import _helpers as h

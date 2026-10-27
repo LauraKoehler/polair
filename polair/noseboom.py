@@ -17,6 +17,7 @@ Adiabatic corrections are used and the wind components are determined.
 
     polair noseboom -f <flight number> -c <config file>
 
+Required are the path to the config file and the flight number.
 """
 
 from . import _helpers as h
