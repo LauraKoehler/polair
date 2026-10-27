@@ -79,12 +79,10 @@ def run(args):
     pf = "tbird"
 
     twist_angle = 0
+    data_corr = xr.Dataset()
     for v in ["qb", "qc", "ps", "alpha", "beta"]:
         da = corr.alignement_correction(data, fhp_params, v, pf, twist_angle).rename(v)
-        try:
-            data_corr[v] = da
-        except:
-            data_corr = da.to_dataset()
+        data_corr[v] = da
 
     # Some corrections:
     data_corr["qc"] = data_corr["qc"].where(data_corr["qc"]>0, other = 0)
