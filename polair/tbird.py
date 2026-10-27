@@ -20,8 +20,8 @@ The tbird command determines the meteorological parameters from the T-Bird simil
 """
 
 from . import _helpers as h
-from . import _corr_fcts as corr 
-import numpy as np
+from . import _corr_fcts as corr
+import os
 import xarray as xr
 import pandas as pd
 
@@ -62,6 +62,7 @@ def run(args):
     fhp_params = h.import_dictionary(config["paths"]["fiveholeprobe"])
     indir = config["paths"]["outdirs"]["raw"]
     outdir = config["paths"]["outdirs"]["tbird"]
+    os.makedirs(outdir, exist_ok=True)
     flight_date = str(config["flights"][flight]["date"]).replace("-","")
     campaign = config["campaign"]["name"]
     fn_in = indir+"/"+campaign+"_"+flight_date+f"_RF{flight:02}_calibrated_raw_data.nc"
