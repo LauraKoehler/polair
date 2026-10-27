@@ -11,7 +11,6 @@ Part of the polair package.
 """
 
 import numpy as np
-import pandas as pd
 import xarray as xr
 import scipy.signal as sig
 from scipy.ndimage import binary_dilation
