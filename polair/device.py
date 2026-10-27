@@ -140,7 +140,8 @@ def run(args):
         out_ds[v].attrs = {}
         out_ds = h.add_attrs_var(out_ds, v, out_vars)
         
-    # Resampling to 1 sec time resolution is only done if instrument listed in config file to resample. Otherwise, the original time stamps are kept.
+    # Resampling to 1 sec time resolution is only done if instrument listed in
+    # config file to resample. Otherwise, the original time stamps are kept.
     try: 
         toresample = config["campaign"]["resampling"]
     except:
